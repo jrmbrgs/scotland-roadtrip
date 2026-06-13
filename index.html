@@ -202,6 +202,21 @@
     font-family:"Fraunces",serif;font-weight:500;
     font-size:1.7rem;margin:0;line-height:1.1;letter-spacing:-.01em;
   }
+  .card-teaser{
+    font-size:.85rem;color:var(--muted);margin:4px 0 0;font-style:italic;
+  }
+  .weather-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    font-family:"Spline Sans Mono",monospace;font-size:.7rem;
+    padding:3px 8px;border-radius:7px;background:rgba(31,92,88,.08);color:var(--teal);
+  }
+  .weather-badge img{width:24px;height:24px}
+  .new-badge{
+    display:inline-block;width:8px;height:8px;border-radius:50%;
+    background:var(--gold);margin-left:6px;vertical-align:middle;
+    animation:pulse-gold 2s infinite;
+  }
+  @keyframes pulse-gold{0%,100%{box-shadow:0 0 0 0 rgba(189,133,38,.4)}50%{box-shadow:0 0 0 5px rgba(189,133,38,0)}}
   .meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 2px}
   .chip{
     font-family:"Spline Sans Mono",monospace;font-size:.74rem;letter-spacing:.02em;
@@ -447,8 +462,8 @@
     <h1>Highlands<br><em>d'Écosse</em></h1>
     <p class="sub">Châteaux perdus dans la brume, lochs sombres, falaises battues par le vent — suivez-nous au bout de l'Écosse.</p>
     <div class="stat-row">
+      <div class="stat"><span class="n" id="countdown"></span><span class="l" id="countdown-label"></span></div>
       <div class="stat"><span class="n">10</span><span class="l">étapes</span></div>
-      <div class="stat"><span class="n">18</span><span class="l">jours</span></div>
       <div class="stat"><span class="n">~1 400</span><span class="l">km</span></div>
       <div class="stat"><span class="n">27 juin</span><span class="l">→ 14 juillet</span></div>
     </div>
@@ -494,6 +509,7 @@
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1661727010879-f7c591bb4fc4?auto=format&fit=crop&w=1000&q=70')"></div>
         <div class="card-body">
         <h2>Départ de Nice</h2>
+        <p class="card-teaser">L'aventure commence sur le tarmac</p>
         <div class="meta"><span class="chip">27 juin</span><span class="chip nights">✈️ vol</span></div>
         <p class="trajet">✈️ <b>Vol</b> — Nice → Édimbourg</p>
         <div class="gallery-section loading" data-tag="depart"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
@@ -508,6 +524,7 @@
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1595599014147-a419c147bdc0?auto=format&fit=crop&w=1000&q=70')"></div>
         <div class="card-body">
         <h2>Édimbourg</h2>
+        <p class="card-teaser">Ruelles médiévales, château et Arthur's Seat</p>
         <div class="meta"><span class="chip">27 → 29 juin</span><span class="chip nights">2 nuits</span></div>
         <p class="hotel"><span class="pin">🏨</span> Caravel / Atlas Guest House<small>30 London St, Edinburgh EH3 6NA</small></p>
         <div class="gallery-section loading" data-tag="edinburgh"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
@@ -537,6 +554,7 @@
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1505832018823-50331d70d237?auto=format&fit=crop&w=1000&q=70')"></div>
         <div class="card-body">
         <h2>Fort William</h2>
+        <p class="card-teaser">Au pied du Ben Nevis, porte des Highlands</p>
         <div class="meta"><span class="chip">29 → 30 juin</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Family Friendly Apartment<small>Fort William — adresse exacte sur la confirmation Booking</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Édimbourg → Fort William · ~4h</p>
@@ -570,6 +588,7 @@
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1656714798625-00bec94c4e66?auto=format&fit=crop&w=1000&q=70')"></div>
         <div class="card-body">
         <h2>Mallaig</h2>
+        <p class="card-teaser">Viaduc de Glenfinnan et plages de sable blanc</p>
         <div class="meta"><span class="chip">30 juin → 1 juil.</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Fair Winds B&amp;B <small>Morar PH40 4PD · chez Janet · ⚠️ départ tôt, ferry à 8h45</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Fort William → Mallaig (Road to the Isles) · ~2h</p>
@@ -603,6 +622,7 @@
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1667122169237-f9826de1786b?auto=format&fit=crop&w=1000&q=70')"></div>
         <div class="card-body">
         <h2>Île de Skye</h2>
+        <p class="card-teaser">Paysages lunaires, fairy pools et falaises vertigineuses</p>
         <div class="meta"><span class="chip">1 → 5 juillet</span><span class="chip nights">4 nuits</span></div>
         <p class="hotel"><span class="pin">🏨</span> The Rock — Dunvegan <small>1-4/7 (3 nuits) · adresse via Airbnb</small></p>
         <p class="hotel"><span class="pin">🏨</span> The Cowshed Boutique Bunkhouse <small>4-5/7 (1 nuit) · Uig, Isle of Skye IV51 9YD</small></p>
@@ -645,6 +665,7 @@
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1518386943617-2f959159d0c7?auto=format&fit=crop&w=1000&q=70')"></div>
         <div class="card-body">
         <h2>Ullapool</h2>
+        <p class="card-teaser">Port de pêche au bout du Loch Broom</p>
         <div class="meta"><span class="chip">5 → 6 juillet</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> The Arch Inn<small>10-11 West Shore St, Ullapool IV26 2UR</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Skye → Ullapool · ~3h30-4h</p>
@@ -678,6 +699,7 @@
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1687526492768-0224eed0d6c5?auto=format&fit=crop&w=1000&q=70')"></div>
         <div class="card-body">
         <h2>Durness</h2>
+        <p class="card-teaser">Grottes, plages désertes et bout du monde</p>
         <div class="meta"><span class="chip">6 → 8 juillet</span><span class="chip nights">2 nuits</span></div>
         <p class="hotel"><span class="pin">🏨</span> Wild Orchid Guest House<small>Durine, Durness IV27 4PN</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Ullapool → Durness · ~3h30-4h · 👉 route superbe mais lente, prévoir des pauses</p>
@@ -711,6 +733,7 @@
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1651519523579-9d744ae3f107?auto=format&fit=crop&w=1000&q=70')"></div>
         <div class="card-body">
         <h2>Dunnet</h2>
+        <p class="card-teaser">Le point le plus au nord de la Grande-Bretagne</p>
         <div class="meta"><span class="chip">8 → 10 juillet</span><span class="chip nights">2 nuits</span></div>
         <p class="hotel"><span class="pin">🏨</span> Sinclair Bay Lodges<small>Keiss, Wick KW1 4AT · ⚠️ côté Keiss/Wick, ~30 min à l'est de Dunnet Head — à vérifier</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Durness → Dunnet · ~2h30</p>
@@ -745,6 +768,7 @@
         <div class="card-photo" style="background-image:url('https://plus.unsplash.com/premium_photo-1714573189973-018546b10078?auto=format&fit=crop&w=1000&q=70')"></div>
         <div class="card-body">
         <h2>Inverness</h2>
+        <p class="card-teaser">Capitale des Highlands et dauphins à Chanonry Point</p>
         <div class="meta"><span class="chip">10 → 12 juillet</span><span class="chip nights">2 nuits</span></div>
         <p class="hotel"><span class="pin">🏨</span> Langdale Lodge<small>Drummond Crescent, Inverness IV2 4QR</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Dunnet → Inverness · ~3h · ➡️ facile, avec un gros arrêt en route</p>
@@ -785,6 +809,7 @@
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1512927638316-b12f8c1abcc4?auto=format&fit=crop&w=1000&q=70')"></div>
         <div class="card-body">
         <h2>Aviemore</h2>
+        <p class="card-teaser">Rennes sauvages et forêts ancestrales des Cairngorms</p>
         <div class="meta"><span class="chip">12 → 13 juillet</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Coylumbridge Resort Hotel<small>Coylumbridge, Aviemore PH22 1QN</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Inverness → Aviemore · ~1h<br>🌅 Le 12/7 : départ ~9h30 → Cairngorm Reindeer Centre, Glenmore (~1h) pour le RDV de 11h, puis check-in.</p>
@@ -818,6 +843,7 @@
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1578770701978-0b6bfec6e492?auto=format&fit=crop&w=1000&q=70')"></div>
         <div class="card-body">
         <h2>Édimbourg</h2>
+        <p class="card-teaser">Dernière soirée écossaise avant le retour</p>
         <div class="meta"><span class="chip">13 → 14 juillet</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Haymarket Hotel<small>11 Coates Gardens, Edinburgh EH12 5LG</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Aviemore → Édimbourg · ~3h, axe A9</p>
@@ -850,6 +876,7 @@
       <article class="card">
         <div class="card-body">
         <h2>Retour à Nice</h2>
+        <p class="card-teaser">La tête pleine de brume et de souvenirs</p>
         <div class="meta"><span class="chip">14 juillet</span><span class="chip nights">✈️ vol</span></div>
         <p class="trajet">✈️ <b>Vol</b> — Édimbourg → Nice</p>
         <div class="gallery-section loading" data-tag="retour"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
@@ -874,6 +901,27 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+  // ---- Countdown ----
+  (function(){
+    const START = new Date('2026-06-27T00:00:00');
+    const END = new Date('2026-07-14T23:59:59');
+    const now = new Date();
+    const el = document.getElementById('countdown');
+    const lbl = document.getElementById('countdown-label');
+    if (now < START) {
+      const days = Math.ceil((START - now) / 86400000);
+      el.textContent = 'J-' + days;
+      lbl.textContent = 'avant le départ';
+    } else if (now <= END) {
+      const day = Math.floor((now - START) / 86400000) + 1;
+      el.textContent = 'Jour ' + day;
+      lbl.textContent = 'en cours';
+    } else {
+      el.textContent = '✓';
+      lbl.textContent = 'terminé';
+    }
+  })();
+
   // ---- Map ----
   const stops = [
     {n:0,  name:"Nice",        d:"27 juin · départ",          lat:43.6655, lng:7.2150,  start:"2026-06-13", end:"2026-06-27", id:"stop-0"},
@@ -1232,7 +1280,9 @@
     }
   });
 
-  document.querySelectorAll('.gallery-section[data-tag]').forEach(section => {
+  function loadGallery(section) {
+    if (section.dataset.loaded) return;
+    section.dataset.loaded = '1';
     const tag = section.dataset.tag;
     const gallery = section.querySelector('.gallery');
     fetch(`https://res.cloudinary.com/${CLOUD}/image/list/${tag}.json`)
@@ -1277,7 +1327,61 @@
         }
       })
       .catch(() => section.remove());
-  });
+  }
+
+  const galObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { loadGallery(e.target); galObs.unobserve(e.target); } });
+  }, { rootMargin: '200px' });
+  document.querySelectorAll('.gallery-section[data-tag]').forEach(s => galObs.observe(s));
+
+  // ---- Weather (OpenMeteo) ----
+  const WEATHER_CODES = {0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',51:'🌦',53:'🌧',55:'🌧',61:'🌧',63:'🌧',65:'🌧',71:'🌨',73:'🌨',75:'🌨',80:'🌦',81:'🌧',82:'🌧',95:'⛈',96:'⛈',99:'⛈'};
+  (async function(){
+    const coords = stops.filter(s => s.n >= 1 && s.n <= 10);
+    const lats = coords.map(s => s.lat).join(',');
+    const lngs = coords.map(s => s.lng).join(',');
+    try {
+      const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Europe/London&forecast_days=3`);
+      const data = await resp.json();
+      const results = Array.isArray(data) ? data : [data];
+      results.forEach((loc, i) => {
+        const stop = coords[i];
+        const section = document.getElementById(stop.id);
+        if (!section || !loc.daily) return;
+        const code = loc.daily.weathercode[0];
+        const tMax = Math.round(loc.daily.temperature_2m_max[0]);
+        const tMin = Math.round(loc.daily.temperature_2m_min[0]);
+        const icon = WEATHER_CODES[code] || '🌤';
+        const meta = section.querySelector('.meta');
+        if (meta) {
+          meta.insertAdjacentHTML('beforeend',
+            `<span class="weather-badge">${icon} ${tMin}°/${tMax}°</span>`
+          );
+        }
+      });
+    } catch(e) {}
+  })();
+
+  // ---- New post badge ----
+  (function(){
+    const seen = JSON.parse(localStorage.getItem('scotland-seen-posts') || '{}');
+    fetch(`${FB}/posts.json`).then(r => r.json()).then(allPosts => {
+      if (!allPosts) return;
+      const newSeen = {};
+      Object.entries(allPosts).forEach(([tag, posts]) => {
+        const keys = Object.keys(posts);
+        newSeen[tag] = keys.length;
+        const prev = seen[tag] || 0;
+        if (keys.length > prev) {
+          const title = document.querySelector(`.gallery-section[data-tag="${tag}"]`)?.closest('.card-body')?.querySelector('.gallery-title');
+          if (title && !title.querySelector('.new-badge')) {
+            title.insertAdjacentHTML('beforeend', '<span class="new-badge" title="Nouveau"></span>');
+          }
+        }
+      });
+      localStorage.setItem('scotland-seen-posts', JSON.stringify(newSeen));
+    });
+  })();
 </script>
 </body>
 </html>
