@@ -145,6 +145,7 @@
     font-size:.72rem;font-weight:600;
   }
   .map-pin.last{background:var(--heather)}
+  .map-pin.active{background:var(--gold);transform:rotate(-45deg) scale(1.25);border-color:#fff;box-shadow:0 2px 8px rgba(189,133,38,.5)}
   .leaflet-popup-content-wrapper{border-radius:10px}
   .leaflet-popup-content{font-family:"Inter",sans-serif;margin:10px 13px;font-size:.85rem}
   .leaflet-popup-content b{font-family:"Fraunces",serif;font-weight:500;font-size:1rem}
@@ -158,6 +159,7 @@
   .map-legend i{display:inline-block;width:20px;height:0;vertical-align:middle;margin-right:5px}
   .map-legend i.r{border-top:4px solid var(--teal)}
   .map-legend i.f{border-top:3px dashed #2E86AB}
+  .map-legend i.fl{border-top:2px dashed #8B6BAE}
 
   /* ---------- ROUTE / TIMELINE ---------- */
   main{max-width:var(--maxw);margin:0 auto;padding:46px 24px 90px;position:relative}
@@ -744,17 +746,19 @@
 <script>
   // ---- Map ----
   const stops = [
-    {n:1,  name:"Édimbourg",   d:"27 → 29 juin · 2 nuits",   lat:55.9533, lng:-3.1883},
-    {n:2,  name:"Fort William",d:"29 → 30 juin · 1 nuit",    lat:56.8198, lng:-5.1052},
-    {n:3,  name:"Mallaig",     d:"30 juin → 1 juil. · 1 nuit",lat:57.0058, lng:-5.8285},
-    {n:4,  name:"Île de Skye", d:"1 → 5 juil. · 4 nuits",     lat:57.4419, lng:-6.5897},
-    {n:5,  name:"Ullapool",    d:"5 → 6 juil. · 1 nuit",      lat:57.8956, lng:-5.1618},
-    {n:6,  name:"Durness",     d:"6 → 8 juil. · 2 nuits",     lat:58.5683, lng:-4.7497},
-    {n:7,  name:"Dunnet",      d:"8 → 10 juil. · 2 nuits",    lat:58.6173, lng:-3.3573},
-    {n:8,  name:"Inverness",   d:"10 → 12 juil. · 2 nuits",   lat:57.4778, lng:-4.2247},
-    {n:9,  name:"Aviemore",    d:"12 → 13 juil. · 1 nuit",    lat:57.1958, lng:-3.8253},
-    {n:10, name:"Édimbourg",   d:"13 → 14 juil. · 1 nuit",    lat:55.9533, lng:-3.1883}
+    {n:0,  name:"Nice",        d:"27 juin · départ",          lat:43.6655, lng:7.2150,  start:"2026-06-13", end:"2026-06-27", id:"stop-0"},
+    {n:1,  name:"Édimbourg",   d:"27 → 29 juin · 2 nuits",   lat:55.9533, lng:-3.1883, start:"2026-06-27", end:"2026-06-29", id:"stop-1"},
+    {n:2,  name:"Fort William",d:"29 → 30 juin · 1 nuit",    lat:56.8198, lng:-5.1052, start:"2026-06-29", end:"2026-06-30", id:"stop-2"},
+    {n:3,  name:"Mallaig",     d:"30 juin → 1 juil. · 1 nuit",lat:57.0058, lng:-5.8285, start:"2026-06-30", end:"2026-07-01", id:"stop-3"},
+    {n:4,  name:"Île de Skye", d:"1 → 5 juil. · 4 nuits",     lat:57.4419, lng:-6.5897, start:"2026-07-01", end:"2026-07-05", id:"stop-4"},
+    {n:5,  name:"Ullapool",    d:"5 → 6 juil. · 1 nuit",      lat:57.8956, lng:-5.1618, start:"2026-07-05", end:"2026-07-06", id:"stop-5"},
+    {n:6,  name:"Durness",     d:"6 → 8 juil. · 2 nuits",     lat:58.5683, lng:-4.7497, start:"2026-07-06", end:"2026-07-08", id:"stop-6"},
+    {n:7,  name:"Dunnet",      d:"8 → 10 juil. · 2 nuits",    lat:58.6173, lng:-3.3573, start:"2026-07-08", end:"2026-07-10", id:"stop-7"},
+    {n:8,  name:"Inverness",   d:"10 → 12 juil. · 2 nuits",   lat:57.4778, lng:-4.2247, start:"2026-07-10", end:"2026-07-12", id:"stop-8"},
+    {n:9,  name:"Aviemore",    d:"12 → 13 juil. · 1 nuit",    lat:57.1958, lng:-3.8253, start:"2026-07-12", end:"2026-07-13", id:"stop-9"},
+    {n:10, name:"Édimbourg",   d:"13 → 14 juil. · 1 nuit",    lat:55.9533, lng:-3.1883, start:"2026-07-13", end:"2026-07-14", id:"stop-10"}
   ];
+  const mapToday = new Date().toISOString().slice(0, 10);
 
   if (window.L) {
     const map = L.map('map', { scrollWheelZoom:false });
@@ -766,13 +770,15 @@
     // ---- route segments: real driving routes + ferry crossing ----
     const driveStyle = { color:'#1F5C58', weight:4, opacity:.85, lineCap:'round', lineJoin:'round' };
     const ferryStyle = { color:'#2E86AB', weight:3, opacity:.95, dashArray:'3 9', lineCap:'round' };
-    const ARMADALE = { lat:57.0648, lng:-5.8939 }; // débarquement ferry sur Skye
+    const flightStyle = { color:'#8B6BAE', weight:2, opacity:.6, dashArray:'6 8', lineCap:'round' };
+    const ARMADALE = { lat:57.0648, lng:-5.8939 };
 
-    // build ordered segments; Mallaig → Skye = ferry then road
     const segs = [];
     for (let i = 0; i < stops.length - 1; i++){
       const a = stops[i], b = stops[i+1];
-      if (a.name === "Mallaig"){
+      if (a.name === "Nice"){
+        segs.push({ a:{lat:a.lat,lng:a.lng}, b:{lat:b.lat,lng:b.lng}, mode:"flight" });
+      } else if (a.name === "Mallaig"){
         segs.push({ a:{lat:a.lat,lng:a.lng}, b:ARMADALE, mode:"ferry" });
         segs.push({ a:ARMADALE, b:{lat:b.lat,lng:b.lng}, mode:"drive" });
       } else {
@@ -785,6 +791,7 @@
     }
 
     segs.forEach(seg => {
+      if (seg.mode === "flight"){ drawStraight(seg.a, seg.b, flightStyle); return; }
       if (seg.mode === "ferry"){ drawStraight(seg.a, seg.b, ferryStyle); return; }
       const url = `https://router.project-osrm.org/route/v1/driving/`
         + `${seg.a.lng},${seg.a.lat};${seg.b.lng},${seg.b.lat}`
@@ -805,21 +812,30 @@
     // numbered pins
     stops.forEach((s, i) => {
       const last = (i === stops.length - 1);
+      const isCurrent = mapToday >= s.start && mapToday <= s.end;
+      const cls = ['map-pin'];
+      if (last) cls.push('last');
+      if (isCurrent) cls.push('active');
       const icon = L.divIcon({
         className:'',
-        html:`<div class="map-pin${last ? ' last' : ''}"><span>${s.n}</span></div>`,
+        html:`<div class="${cls.join(' ')}"><span>${s.n}</span></div>`,
         iconSize:[30,30], iconAnchor:[15,30], popupAnchor:[0,-30]
       });
-      L.marker([s.lat, s.lng], { icon })
+      const marker = L.marker([s.lat, s.lng], { icon, zIndexOffset: isCurrent ? 1000 : 0 })
         .addTo(map)
-        .bindPopup(`<b>${s.n}. ${s.name}</b><br><span class="pd">${s.d}</span>`);
+        .bindPopup(`<a href="#${s.id}" style="text-decoration:none;color:inherit"><b>${s.n}. ${s.name}</b><br><span class="pd">${s.d}</span></a>`);
+      if (isCurrent) marker.openPopup();
+      marker.on('click', () => {
+        const el = document.getElementById(s.id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     });
 
     // legend
     const legend = L.control({ position:"bottomleft" });
     legend.onAdd = function(){
       const d = L.DomUtil.create("div", "map-legend");
-      d.innerHTML = '<i class="r"></i> Route&nbsp;&nbsp;&nbsp;<i class="f"></i> Ferry';
+      d.innerHTML = '<i class="r"></i> Route&nbsp;&nbsp;&nbsp;<i class="f"></i> Ferry&nbsp;&nbsp;&nbsp;<i class="fl"></i> Vol';
       return d;
     };
     legend.addTo(map);
