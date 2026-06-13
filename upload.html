@@ -123,6 +123,14 @@
   }
   .post-item .save-btn{background:var(--teal);color:#fff}
   .post-item .cancel-btn{background:var(--mist-2);color:var(--muted)}
+  .post-replies{margin:8px 0 0;padding-left:14px;border-left:2px solid var(--mist-2)}
+  .post-reply{font-size:.82rem;margin:4px 0;color:var(--ink)}
+  .post-reply .reply-author{font-weight:500;color:var(--teal)}
+  .post-reply .reply-date{font-size:.7rem;color:var(--muted);margin-left:6px}
+  .post-reply .reply-delete{
+    background:none;border:none;cursor:pointer;font-size:.65rem;
+    color:#c0392b;margin-left:6px;padding:0 4px;
+  }
   .post-tag{
     font-family:"Spline Sans Mono",monospace;font-size:.65rem;
     padding:2px 6px;border-radius:4px;background:var(--mist-2);color:var(--teal);
@@ -331,6 +339,17 @@ function loadAllPosts() {
       flat.forEach(post => {
         const d = new Date(post.ts);
         const date = d.toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+        let repliesHtml = '';
+        if (post.replies) {
+          repliesHtml = '<div class="post-replies">' + Object.entries(post.replies).map(([rk, r]) => {
+            const rd = new Date(r.ts).toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+            return `<div class="post-reply" data-reply-key="${rk}">
+              <span class="reply-author">${escHtml(r.author || 'Anonyme')}</span> ${escHtml(r.text)}
+              <span class="reply-date">${rd}</span>
+              <button class="reply-delete">×</button>
+            </div>`;
+          }).join('') + '</div>';
+        }
         allPostsList.insertAdjacentHTML('beforeend', `
           <div class="post-item" data-tag="${post.tag}" data-key="${post.key}">
             <p class="post-text">${escHtml(post.text)}</p>
@@ -341,6 +360,7 @@ function loadAllPosts() {
                 <button class="delete-btn">supprimer</button>
               </div>
             </div>
+            ${repliesHtml}
           </div>
         `);
       });
@@ -403,6 +423,13 @@ allPostsList.addEventListener('click', async e => {
   }
 
   if (e.target.classList.contains('cancel-btn')) {
+    loadAllPosts();
+  }
+
+  if (e.target.classList.contains('reply-delete')) {
+    const reply = e.target.closest('.post-reply');
+    const rk = reply.dataset.replyKey;
+    await fetch(`${FB}/posts/${tag}/${key}/replies/${rk}.json`, { method: 'DELETE' });
     loadAllPosts();
   }
 });
