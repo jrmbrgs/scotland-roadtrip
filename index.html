@@ -255,6 +255,19 @@
   .warn{color:var(--gold)}
 
   /* ---------- PHOTO GALLERY ---------- */
+  .programme-section{
+    margin-top:20px;border-top:1px solid var(--line);padding-top:16px;
+  }
+  .programme-title{
+    font-family:"Spline Sans Mono",monospace;
+    font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--teal);margin:0 0 4px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .programme-title::before{
+    content:"";display:block;width:18px;height:2px;background:var(--teal);border-radius:1px;
+  }
+  .programme-section .block{margin-top:14px}
   .posts-section{
     margin-top:20px;border-top:1px solid var(--line);padding-top:16px;
   }
@@ -431,6 +444,9 @@
         <h2>Édimbourg</h2>
         <div class="meta"><span class="chip">27 → 29 juin</span><span class="chip nights">2 nuits</span></div>
         <p class="hotel"><span class="pin">🏨</span> Caravel / Atlas Guest House<small>30 London St, Edinburgh EH3 6NA</small></p>
+        <div class="gallery-section loading" data-tag="edinburgh"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="programme-section">
+        <p class="programme-title">Programme</p>
         <div class="block place-b">
           <p class="block-h"><span class="tag"></span> Sur place</p>
           <ul class="items">
@@ -443,7 +459,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Royal Botanic Garden</span> — <span class="note">calme, gratuit</span></span></li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="edinburgh"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        </div>
         </div>
       </article>
     </section>
@@ -458,6 +474,9 @@
         <div class="meta"><span class="chip">29 → 30 juin</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Family Friendly Apartment<small>Fort William — adresse exacte sur la confirmation Booking</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Édimbourg → Fort William · ~4h</p>
+        <div class="gallery-section loading" data-tag="fort-william"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="programme-section">
+        <p class="programme-title">Programme</p>
         <div class="block route-b">
           <p class="block-h"><span class="tag"></span> Sur la route</p>
           <ul class="items">
@@ -473,7 +492,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Ben Nevis (au pied)</span> — <span class="note">+ front de loch / Old Fort</span></span></li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="fort-william"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        </div>
         </div>
       </article>
     </section>
@@ -488,6 +507,9 @@
         <div class="meta"><span class="chip">30 juin → 1 juil.</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Fair Winds B&amp;B <small>Morar PH40 4PD · chez Janet · ⚠️ départ tôt, ferry à 8h45</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Fort William → Mallaig (Road to the Isles) · ~2h</p>
+        <div class="gallery-section loading" data-tag="mallaig"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="programme-section">
+        <p class="programme-title">Programme</p>
         <div class="block route-b">
           <p class="block-h"><span class="tag"></span> Sur la route</p>
           <ul class="items">
@@ -503,7 +525,7 @@
             <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Morar</span> — <span class="note">plages de sable blanc avant Mallaig</span></span></li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="mallaig"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        </div>
         </div>
       </article>
     </section>
@@ -528,6 +550,9 @@
             <li><strong>12h</strong> croisière AquaXplore Elgol <em>(réservé)</em> — au port vers 11h40</li>
           </ul>
         </div>
+        <div class="gallery-section loading" data-tag="skye"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="programme-section">
+        <p class="programme-title">Programme</p>
         <div class="block place-b">
           <p class="block-h"><span class="tag"></span> Sur place · 4 jours</p>
           <ul class="items">
@@ -542,7 +567,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Dunvegan Castle &amp; jardins</span> — <span class="note">optionnel</span></span></li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="skye"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        </div>
         </div>
       </article>
     </section>
@@ -557,6 +582,9 @@
         <div class="meta"><span class="chip">5 → 6 juillet</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> The Arch Inn<small>10-11 West Shore St, Ullapool IV26 2UR</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Skye → Ullapool · ~3h30-4h</p>
+        <div class="gallery-section loading" data-tag="ullapool"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="programme-section">
+        <p class="programme-title">Programme</p>
         <div class="block route-b">
           <p class="block-h"><span class="tag"></span> Sur la route</p>
           <ul class="items">
@@ -572,7 +600,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Ullapool Museum</span> — <span class="note">histoire locale, ancienne église</span></span></li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="ullapool"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        </div>
         </div>
       </article>
     </section>
@@ -587,6 +615,9 @@
         <div class="meta"><span class="chip">6 → 8 juillet</span><span class="chip nights">2 nuits</span></div>
         <p class="hotel"><span class="pin">🏨</span> Wild Orchid Guest House<small>Durine, Durness IV27 4PN</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Ullapool → Durness · ~3h30-4h · 👉 route superbe mais lente, prévoir des pauses</p>
+        <div class="gallery-section loading" data-tag="durness"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="programme-section">
+        <p class="programme-title">Programme</p>
         <div class="block route-b">
           <p class="block-h"><span class="tag"></span> Sur la route · 6 juil.</p>
           <ul class="items">
@@ -602,7 +633,7 @@
             <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Balnakeil Beach</span></span></li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="durness"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        </div>
         </div>
       </article>
     </section>
@@ -617,6 +648,9 @@
         <div class="meta"><span class="chip">8 → 10 juillet</span><span class="chip nights">2 nuits</span></div>
         <p class="hotel"><span class="pin">🏨</span> Sinclair Bay Lodges<small>Keiss, Wick KW1 4AT · ⚠️ côté Keiss/Wick, ~30 min à l'est de Dunnet Head — à vérifier</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Durness → Dunnet · ~2h30</p>
+        <div class="gallery-section loading" data-tag="dunnet"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="programme-section">
+        <p class="programme-title">Programme</p>
         <div class="block route-b">
           <p class="block-h"><span class="tag"></span> Sur la route</p>
           <ul class="items">
@@ -633,7 +667,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Phoques &amp; oiseaux marins</span></span></li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="dunnet"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        </div>
         </div>
       </article>
     </section>
@@ -655,6 +689,9 @@
             <li><span class="warn">⚠️</span> Parking petit et vite plein → arriver tôt, courte marche jusqu'à la pointe</li>
           </ul>
         </div>
+        <div class="gallery-section loading" data-tag="inverness"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="programme-section">
+        <p class="programme-title">Programme</p>
         <div class="block route-b">
           <p class="block-h"><span class="tag"></span> Sur la route</p>
           <ul class="items">
@@ -670,7 +707,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Parcs, rivière</span></span></li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="inverness"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        </div>
         </div>
       </article>
     </section>
@@ -685,6 +722,9 @@
         <div class="meta"><span class="chip">12 → 13 juillet</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Coylumbridge Resort Hotel<small>Coylumbridge, Aviemore PH22 1QN</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Inverness → Aviemore · ~1h<br>🌅 Le 12/7 : départ ~9h30 → Cairngorm Reindeer Centre, Glenmore (~1h) pour le RDV de 11h, puis check-in.</p>
+        <div class="gallery-section loading" data-tag="aviemore"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="programme-section">
+        <p class="programme-title">Programme</p>
         <div class="block route-b">
           <p class="block-h"><span class="tag"></span> Sur la route</p>
           <ul class="items">
@@ -700,7 +740,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Landmark Forest Adventure Park</span> — <span class="note">activités famille</span></span></li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="aviemore"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        </div>
         </div>
       </article>
     </section>
@@ -715,6 +755,9 @@
         <div class="meta"><span class="chip">13 → 14 juillet</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Haymarket Hotel<small>11 Coates Gardens, Edinburgh EH12 5LG</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Aviemore → Édimbourg · ~3h, axe A9</p>
+        <div class="gallery-section loading" data-tag="edinburgh-retour"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="programme-section">
+        <p class="programme-title">Programme</p>
         <div class="block route-b">
           <p class="block-h"><span class="tag"></span> Sur la route</p>
           <ul class="items">
@@ -730,7 +773,7 @@
             <li class="note-only" data-prio="1"><span class="stars">★</span><span class="it-body">Ce qui n'a pas pu être fait à l'étape 1 (Holyrood, Dean Village, Calton Hill…)</span></li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="edinburgh-retour"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        </div>
         </div>
       </article>
     </section>
