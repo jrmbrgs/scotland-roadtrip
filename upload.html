@@ -344,7 +344,7 @@ function loadAllPosts() {
           repliesHtml = '<div class="post-replies">' + Object.entries(post.replies).map(([rk, r]) => {
             const rd = new Date(r.ts).toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
             return `<div class="post-reply" data-reply-key="${rk}">
-              <span class="reply-author">${escHtml(r.author || 'Anonyme')}</span> ${escHtml(r.text)}
+              <span class="reply-author">${escHtml(r.name || r.author || 'Anonyme')}</span> ${escHtml(r.text)}
               <span class="reply-date">${rd}</span>
               <button class="reply-delete">×</button>
             </div>`;
