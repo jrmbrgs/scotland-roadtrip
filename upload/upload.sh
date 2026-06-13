@@ -30,9 +30,19 @@ for tag_dir in "$TOSEND_DIR"/*/; do
       *) continue ;;
     esac
 
+    if [ "$ext_lower" = "heic" ]; then
+      jpg_file="${file%.*}.jpg"
+      sips -s format jpeg "$file" --out "$jpg_file" > /dev/null 2>&1
+      rm "$file"
+      file="$jpg_file"
+      echo "  🔄 HEIC → JPEG"
+    fi
+
     filename=$(basename "$file")
     name_no_ext="${filename%.*}"
-    public_id="${tag}/$(echo "$name_no_ext" | sed 's/ /-/g')"
+    title=$(echo "$name_no_ext" | sed 's/[-_]/ /g' | sed 's/  */ /g')
+
+    public_id="${tag}/$(echo "$title" | sed 's/ /-/g' | sed "s/[',]//g")"
     timestamp=$(date +%s)
     signature=$(printf "public_id=%s&tags=%s&timestamp=%s%s" "$public_id" "$tag" "$timestamp" "$API_SECRET" | shasum -a 1 | cut -d' ' -f1)
 
@@ -47,13 +57,15 @@ for tag_dir in "$TOSEND_DIR"/*/; do
 
     if echo "$response" | grep -q '"public_id"'; then
       mv "$file" "$SENT_DIR/$tag/"
-      echo "  ✓ $filename → tag:$tag"
+      echo "  ✓ $filename → tag:$tag · titre: $title"
       count=$((count + 1))
     else
       error=$(echo "$response" | grep -o '"message":"[^"]*"' | head -1)
       echo "  ✗ $filename — $error"
       errors=$((errors + 1))
     fi
+
+    sleep 1
   done
 done
 
