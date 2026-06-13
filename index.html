@@ -295,6 +295,7 @@
   }
   .post-bubble p{margin:0;font-size:.88rem;white-space:pre-wrap;line-height:1.5}
   .post-bubble .post-date{font-size:.7rem;color:var(--muted);margin-top:6px}
+  .post-bubble .post-author{font-weight:500;color:var(--teal);font-size:.78rem}
   .post-replies{margin:6px 0 0;padding-left:14px;border-left:2px solid var(--mist-2)}
   .post-reply{margin:6px 0;font-size:.82rem}
   .post-reply .reply-author{font-weight:500;color:var(--teal)}
@@ -1111,7 +1112,7 @@
             const replies = renderReplies(p.replies);
             return `<div class="post-bubble" data-tag="${tag}" data-key="${key}">
               <p>${text}</p>
-              <div class="post-date">${p.author ? p.author + ' · ' : ''}${date}</div>
+              <div class="post-date">${p.author ? '<span class="post-author">' + esc(p.author) + '</span> · ' : ''}${date}</div>
               ${replies}
               <button class="reply-toggle">Répondre</button>
               <div class="reply-form" style="display:none">
