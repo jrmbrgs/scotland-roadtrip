@@ -146,6 +146,13 @@
   }
   .map-pin.last{background:var(--heather)}
   .map-pin.active{background:var(--gold);transform:rotate(-45deg) scale(1.25);border-color:#fff;box-shadow:0 2px 8px rgba(189,133,38,.5)}
+  .live-dot{
+    width:16px;height:16px;border-radius:50%;
+    background:#e74c3c;border:3px solid #fff;
+    box-shadow:0 0 0 4px rgba(231,76,60,.3),0 2px 6px rgba(0,0,0,.3);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(231,76,60,.3),0 2px 6px rgba(0,0,0,.3)}50%{box-shadow:0 0 0 10px rgba(231,76,60,.1),0 2px 6px rgba(0,0,0,.3)}}
   .leaflet-popup-content-wrapper{border-radius:10px}
   .leaflet-popup-content{font-family:"Inter",sans-serif;margin:10px 13px;font-size:.85rem}
   .leaflet-popup-content b{font-family:"Fraunces",serif;font-weight:500;font-size:1rem}
@@ -910,6 +917,26 @@
     // ensure correct sizing once layout/fonts settle
     setTimeout(() => map.invalidateSize(), 250);
     window.addEventListener('load', () => map.invalidateSize());
+
+    // ---- Live position from Firebase ----
+    fetch(`${FB}/location.json`)
+      .then(r => r.json())
+      .then(loc => {
+        if (!loc || !loc.lat) return;
+        const age = Date.now() - loc.ts;
+        if (age > 48 * 3600 * 1000) return;
+        const liveIcon = L.divIcon({
+          className: '',
+          html: '<div class="live-dot"></div>',
+          iconSize: [16, 16], iconAnchor: [8, 8], popupAnchor: [0, -12]
+        });
+        const ago = age < 3600000
+          ? `il y a ${Math.round(age / 60000)} min`
+          : `il y a ${Math.round(age / 3600000)}h`;
+        L.marker([loc.lat, loc.lng], { icon: liveIcon, zIndexOffset: 2000 })
+          .addTo(map)
+          .bindPopup(`<b>Position actuelle</b><br><span class="pd">${ago}</span>`);
+      });
   } else {
     document.getElementById('map').innerHTML =
       '<div style="padding:24px;font-size:.9rem;color:var(--muted);text-align:center">' +

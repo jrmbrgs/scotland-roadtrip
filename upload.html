@@ -110,6 +110,18 @@
   .post-item .delete-btn{
     background:none;border:none;color:#c0392b;cursor:pointer;font-size:.72rem;padding:2px 6px;
   }
+  .gps-btn{
+    display:block;width:100%;margin-top:16px;padding:14px;
+    font:inherit;font-size:.95rem;font-weight:600;
+    background:var(--gold);color:#fff;border:none;border-radius:10px;
+    cursor:pointer;transition:.2s;
+  }
+  .gps-btn:hover{background:#a67420}
+  .gps-btn:disabled{opacity:.4;cursor:not-allowed}
+  .gps-status{
+    margin-top:8px;text-align:center;
+    font-size:.85rem;color:var(--muted);
+  }
 </style>
 </head>
 <body>
@@ -162,6 +174,12 @@
   <button class="btn" id="post-btn">Publier</button>
   <div class="summary" id="post-summary"></div>
   <div class="post-list" id="post-list"></div>
+
+  <hr class="separator">
+
+  <label>Position GPS</label>
+  <button class="gps-btn" id="gps-btn">Partager ma position</button>
+  <div class="gps-status" id="gps-status"></div>
 </div>
 
 <script>
@@ -322,6 +340,36 @@ postList.addEventListener('click', async e => {
   const { tag, key } = e.target.dataset;
   await fetch(`${FB}/posts/${tag}/${key}.json`, { method: 'DELETE' });
   loadPosts();
+});
+
+// ---- GPS ----
+const gpsBtn = document.getElementById('gps-btn');
+const gpsStatus = document.getElementById('gps-status');
+
+gpsBtn.addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    gpsStatus.textContent = 'GPS non disponible sur cet appareil';
+    return;
+  }
+  gpsBtn.disabled = true;
+  gpsStatus.textContent = 'Localisation en cours...';
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      const { latitude, longitude } = pos.coords;
+      await fetch(`${FB}/location.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat: latitude, lng: longitude, ts: Date.now() })
+      });
+      gpsStatus.textContent = `Position partagée (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+      gpsBtn.disabled = false;
+    },
+    err => {
+      gpsStatus.textContent = 'Erreur : ' + (err.code === 1 ? 'permission refusée' : 'impossible de localiser');
+      gpsBtn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
 });
 </script>
 </body>
