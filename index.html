@@ -90,22 +90,36 @@
     border-bottom:1px solid var(--line);
   }
   .toolbar-inner{
-    max-width:var(--maxw);margin:0 auto;padding:12px 24px;
-    display:flex;flex-wrap:wrap;align-items:center;gap:14px;justify-content:space-between;
+    max-width:var(--maxw);margin:0 auto;padding:0;
+    display:flex;align-items:center;
   }
-  .legend{font-size:.82rem;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
-  .legend b{color:var(--gold);font-weight:600}
-  .filters{display:flex;gap:6px}
-  .filters button{
-    font:inherit;font-size:.8rem;
-    border:1px solid var(--line);background:var(--paper);color:var(--muted);
-    padding:6px 12px;border-radius:999px;cursor:pointer;transition:.18s;
+  .nav-arrow{
+    flex:none;width:36px;height:44px;
+    display:grid;place-items:center;
+    background:none;border:none;cursor:pointer;
+    color:var(--muted);font-size:1rem;transition:.18s;
   }
-  .filters button:hover{border-color:var(--teal-soft);color:var(--ink)}
-  .filters button[aria-pressed="true"]{
-    background:var(--ink);border-color:var(--ink);color:#f4f3ea;
+  .nav-arrow:hover{color:var(--ink)}
+  .stops-nav{
+    flex:1;display:flex;gap:2px;overflow-x:auto;
+    scrollbar-width:none;padding:8px 4px;
   }
-  .filters button:focus-visible,a:focus-visible{outline:2px solid var(--heather);outline-offset:2px}
+  .stops-nav::-webkit-scrollbar{display:none}
+  .stops-nav a{
+    flex:none;padding:6px 12px;border-radius:999px;
+    font-family:"Spline Sans Mono",monospace;font-size:.72rem;
+    letter-spacing:.02em;text-decoration:none;
+    color:var(--muted);background:transparent;
+    border:1px solid transparent;
+    transition:.18s;white-space:nowrap;
+  }
+  .stops-nav a:hover{border-color:var(--line);color:var(--ink)}
+  .stops-nav a.current{
+    background:var(--teal);border-color:var(--teal);color:#fff;
+  }
+  .stops-nav a.past{color:var(--muted);opacity:.6}
+  .stops-nav a.future{color:var(--ink)}
+  a:focus-visible{outline:2px solid var(--heather);outline-offset:2px}
 
   /* ---------- MAP ---------- */
   .map-section{max-width:var(--maxw);margin:0 auto;padding:40px 24px 4px}
@@ -292,10 +306,6 @@
   .subnotes li{display:block;border:none;padding:2px 0}
   .subnotes strong{color:var(--ink)}
 
-  /* ---------- FILTER STATES ---------- */
-  body.f3 ul.items li[data-prio="2"],
-  body.f3 ul.items li[data-prio="1"],
-  body.f23 ul.items li[data-prio="1"]{display:none}
   .block.is-empty{display:none}
 
   footer{
@@ -332,7 +342,7 @@
   }
 </style>
 </head>
-<body class="f-all">
+<body>
 
 <header class="hero">
   <div class="hero-inner">
@@ -357,16 +367,22 @@
 
 <div class="toolbar">
   <div class="toolbar-inner">
-    <div class="legend">
-      <span><b>★★★</b> incontournable</span>
-      <span><b>★★</b> recommandé</span>
-      <span><b>★</b> si le temps le permet</span>
-    </div>
-    <div class="filters" role="group" aria-label="Filtrer par priorité">
-      <button data-f="all" aria-pressed="true">Tout</button>
-      <button data-f="f23" aria-pressed="false">★★+</button>
-      <button data-f="f3" aria-pressed="false">★★★</button>
-    </div>
+    <button class="nav-arrow" id="nav-prev" aria-label="Étape précédente">◀</button>
+    <nav class="stops-nav" id="stops-nav">
+      <a href="#stop-0" data-start="2026-06-27" data-end="2026-06-27">Départ</a>
+      <a href="#stop-1" data-start="2026-06-27" data-end="2026-06-29">Édimbourg</a>
+      <a href="#stop-2" data-start="2026-06-29" data-end="2026-06-30">Fort William</a>
+      <a href="#stop-3" data-start="2026-06-30" data-end="2026-07-01">Mallaig</a>
+      <a href="#stop-4" data-start="2026-07-01" data-end="2026-07-05">Skye</a>
+      <a href="#stop-5" data-start="2026-07-05" data-end="2026-07-06">Ullapool</a>
+      <a href="#stop-6" data-start="2026-07-06" data-end="2026-07-08">Durness</a>
+      <a href="#stop-7" data-start="2026-07-08" data-end="2026-07-10">Dunnet</a>
+      <a href="#stop-8" data-start="2026-07-10" data-end="2026-07-12">Inverness</a>
+      <a href="#stop-9" data-start="2026-07-12" data-end="2026-07-13">Aviemore</a>
+      <a href="#stop-10" data-start="2026-07-13" data-end="2026-07-14">Édimbourg</a>
+      <a href="#stop-11" data-start="2026-07-14" data-end="2026-07-14">Retour</a>
+    </nav>
+    <button class="nav-arrow" id="nav-next" aria-label="Étape suivante">▶</button>
   </div>
 </div>
 
@@ -374,7 +390,7 @@
   <div class="route">
 
     <!-- 0 — Départ -->
-    <section class="stop">
+    <section class="stop" id="stop-0">
       <div class="node">00</div>
       <article class="card">
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1572372815316-fa5474e31ddc?auto=format&fit=crop&w=1000&q=70')"></div>
@@ -388,7 +404,7 @@
     </section>
 
     <!-- 1 -->
-    <section class="stop">
+    <section class="stop" id="stop-1">
       <div class="node">01</div>
       <article class="card">
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1557096002-7f215e6b5dcf?auto=format&fit=crop&w=1000&q=70')"></div>
@@ -414,7 +430,7 @@
     </section>
 
     <!-- 2 -->
-    <section class="stop">
+    <section class="stop" id="stop-2">
       <div class="node">02</div>
       <article class="card">
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1657023420501-cf3936cb3039?auto=format&fit=crop&w=1000&q=70')"></div>
@@ -444,7 +460,7 @@
     </section>
 
     <!-- 3 -->
-    <section class="stop">
+    <section class="stop" id="stop-3">
       <div class="node">03</div>
       <article class="card">
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1700159411878-bb8bb3301bed?auto=format&fit=crop&w=1000&q=70')"></div>
@@ -474,7 +490,7 @@
     </section>
 
     <!-- 4 -->
-    <section class="stop">
+    <section class="stop" id="stop-4">
       <div class="node">04</div>
       <article class="card">
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1551801691-f0bce83d4f68?auto=format&fit=crop&w=1000&q=70')"></div>
@@ -513,7 +529,7 @@
     </section>
 
     <!-- 5 -->
-    <section class="stop">
+    <section class="stop" id="stop-5">
       <div class="node">05</div>
       <article class="card">
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1672929777497-7d8a4d14ca5b?auto=format&fit=crop&w=1000&q=70')"></div>
@@ -543,7 +559,7 @@
     </section>
 
     <!-- 6 -->
-    <section class="stop">
+    <section class="stop" id="stop-6">
       <div class="node">06</div>
       <article class="card">
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1659977193681-c40fa885527e?auto=format&fit=crop&w=1000&q=70')"></div>
@@ -573,7 +589,7 @@
     </section>
 
     <!-- 7 -->
-    <section class="stop">
+    <section class="stop" id="stop-7">
       <div class="node">07</div>
       <article class="card">
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1603833723632-e110b5f9ad59?auto=format&fit=crop&w=1000&q=70')"></div>
@@ -604,7 +620,7 @@
     </section>
 
     <!-- 8 -->
-    <section class="stop">
+    <section class="stop" id="stop-8">
       <div class="node">08</div>
       <article class="card">
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1689756249310-7375ef4081d9?auto=format&fit=crop&w=1000&q=70')"></div>
@@ -641,7 +657,7 @@
     </section>
 
     <!-- 9 -->
-    <section class="stop">
+    <section class="stop" id="stop-9">
       <div class="node">09</div>
       <article class="card">
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1657023420501-cf3936cb3039?auto=format&fit=crop&w=1000&q=70')"></div>
@@ -671,7 +687,7 @@
     </section>
 
     <!-- 10 -->
-    <section class="stop">
+    <section class="stop" id="stop-10">
       <div class="node">10</div>
       <article class="card">
         <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1648397831904-24e068d84b05?auto=format&fit=crop&w=1000&q=70')"></div>
@@ -701,7 +717,7 @@
     </section>
 
     <!-- 11 — Retour -->
-    <section class="stop">
+    <section class="stop" id="stop-11">
       <div class="node">11</div>
       <article class="card">
         <div class="card-body">
@@ -821,21 +837,49 @@
       'et vérifiez votre connexion internet.</div>';
   }
 
-  // ---- Priority filter ----
-  const body = document.body;
-  const buttons = document.querySelectorAll('.filters button');
-  function applyFilter(f){
-    body.classList.remove('f-all','f23','f3');
-    body.classList.add(f === 'all' ? 'f-all' : f);
-    buttons.forEach(b => b.setAttribute('aria-pressed', b.dataset.f === f));
-    // hide blocks that have no visible items
-    document.querySelectorAll('.block').forEach(block => {
-      const visible = [...block.querySelectorAll('ul.items > li')]
-        .some(li => getComputedStyle(li).display !== 'none');
-      block.classList.toggle('is-empty', !visible);
-    });
+  // ---- Stops navigation ----
+  const navLinks = [...document.querySelectorAll('.stops-nav a')];
+  const nav = document.getElementById('stops-nav');
+  const today = new Date().toISOString().slice(0, 10);
+
+  let currentIdx = -1;
+  navLinks.forEach((a, i) => {
+    const start = a.dataset.start;
+    const end = a.dataset.end;
+    if (today < start) {
+      a.classList.add('future');
+    } else if (today > end) {
+      a.classList.add('past');
+    } else {
+      a.classList.add('current');
+      currentIdx = i;
+    }
+  });
+
+  if (currentIdx >= 0) {
+    const cur = navLinks[currentIdx];
+    nav.scrollLeft = cur.offsetLeft - nav.offsetWidth / 2 + cur.offsetWidth / 2;
   }
-  buttons.forEach(b => b.addEventListener('click', () => applyFilter(b.dataset.f)));
+
+  document.getElementById('nav-prev').addEventListener('click', () => {
+    const idx = Math.max(0, (currentIdx > 0 ? currentIdx : 1) - 1);
+    navLinks[idx].click();
+  });
+  document.getElementById('nav-next').addEventListener('click', () => {
+    const idx = Math.min(navLinks.length - 1, (currentIdx >= 0 ? currentIdx : -1) + 1);
+    navLinks[idx].click();
+  });
+
+  navLinks.forEach(a => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        nav.scrollLeft = a.offsetLeft - nav.offsetWidth / 2 + a.offsetWidth / 2;
+      }
+    });
+  });
 
   // Scroll reveal
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
