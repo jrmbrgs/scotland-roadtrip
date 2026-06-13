@@ -330,39 +330,64 @@
     content:"";display:block;width:18px;height:2px;background:var(--teal-soft);border-radius:1px;
   }
   .gallery{
-    display:flex;gap:10px;overflow-x:auto;
-    padding-bottom:8px;scroll-snap-type:x mandatory;
-    -webkit-overflow-scrolling:touch;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
   }
-  .gallery::-webkit-scrollbar{height:5px}
-  .gallery::-webkit-scrollbar-track{background:transparent}
-  .gallery::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
   .gallery figure{
-    flex:none;scroll-snap-align:start;margin:0;
-    display:flex;flex-direction:column;gap:6px;
+    margin:0;position:relative;overflow:hidden;border-radius:10px;
+    aspect-ratio:1;
   }
+  .gallery figure.hidden{display:none}
   .gallery img{
-    height:160px;width:auto;aspect-ratio:auto;object-fit:cover;border-radius:10px;
-    cursor:pointer;transition:transform .2s,box-shadow .2s;
-    background:var(--mist-2);
-    border:1px solid var(--line);
+    width:100%;height:100%;object-fit:cover;
+    cursor:pointer;transition:transform .3s,box-shadow .2s;
+    background:var(--mist-2);border:1px solid var(--line);border-radius:10px;
   }
-  .gallery img:hover{transform:scale(1.04);box-shadow:0 4px 16px rgba(21,40,42,.12)}
+  .gallery img:hover{transform:scale(1.06);box-shadow:0 4px 16px rgba(21,40,42,.12)}
   .gallery figcaption{
-    font-size:.72rem;color:var(--muted);text-align:center;
-    max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    position:absolute;bottom:0;left:0;right:0;
+    padding:20px 8px 6px;font-size:.68rem;color:#fff;text-align:center;
+    background:linear-gradient(transparent,rgba(0,0,0,.5));
+    border-radius:0 0 10px 10px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    opacity:0;transition:opacity .2s;pointer-events:none;
   }
+  .gallery figure:hover figcaption{opacity:1}
+  .gallery-more{
+    display:block;width:100%;margin-top:10px;padding:10px;
+    font:inherit;font-size:.82rem;font-weight:500;
+    background:var(--paper);color:var(--teal);border:1px solid var(--line);
+    border-radius:10px;cursor:pointer;text-align:center;transition:.2s;
+  }
+  .gallery-more:hover{background:var(--mist-2)}
   .gallery-section.loading .gallery-title::after{
     content:" ·  chargement…";letter-spacing:0;text-transform:none;
     font-size:.72rem;color:var(--muted);
   }
   .lightbox{
     position:fixed;inset:0;z-index:100;
-    background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;
     cursor:zoom-out;opacity:0;pointer-events:none;transition:opacity .25s;
   }
   .lightbox.open{opacity:1;pointer-events:auto}
-  .lightbox img{max-width:92vw;max-height:90vh;border-radius:8px;box-shadow:0 4px 40px rgba(0,0,0,.5)}
+  .lightbox img{max-width:88vw;max-height:85vh;border-radius:8px;box-shadow:0 4px 40px rgba(0,0,0,.5);cursor:default}
+  .lightbox .lb-nav{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:44px;height:44px;border-radius:50%;border:none;
+    background:rgba(255,255,255,.15);color:#fff;font-size:1.4rem;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(4px);transition:.2s;
+  }
+  .lightbox .lb-nav:hover{background:rgba(255,255,255,.3)}
+  .lightbox .lb-prev{left:16px}
+  .lightbox .lb-next{right:16px}
+  .lightbox .lb-counter{
+    position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+    color:rgba(255,255,255,.7);font-size:.8rem;font-family:"Spline Sans Mono",monospace;
+  }
+  .lightbox .lb-caption{
+    position:absolute;bottom:44px;left:50%;transform:translateX(-50%);
+    color:#fff;font-size:.85rem;max-width:80vw;text-align:center;
+  }
 
   /* sub-notes inside an item (Glenfinnan) */
   .subnotes{margin:6px 0 0;padding-left:0;list-style:none;
@@ -400,6 +425,10 @@
     .card-photo{height:130px}
     #map{height:320px}
     .map-section{padding:30px 16px 0}
+    .gallery{grid-template-columns:repeat(2,1fr);gap:6px}
+    .lightbox .lb-prev{left:8px}
+    .lightbox .lb-next{right:8px}
+    .lightbox .lb-nav{width:36px;height:36px;font-size:1.1rem}
   }
   @media print{
     .toolbar,.hero .contours,.map-section,.card-photo{display:none}
@@ -837,7 +866,13 @@
   Dernière mise à jour : juin 2026.
 </footer>
 
-<div class="lightbox" id="lightbox"><img src="" alt=""></div>
+<div class="lightbox" id="lightbox">
+  <button class="lb-nav lb-prev">&#8249;</button>
+  <img src="" alt="">
+  <button class="lb-nav lb-next">&#8250;</button>
+  <div class="lb-caption"></div>
+  <div class="lb-counter"></div>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -1161,10 +1196,43 @@
 
   // ---- Cloudinary photo galleries ----
   const CLOUD = 'brgsjrm';
+  const VISIBLE_COUNT = 6;
   const lb = document.getElementById('lightbox');
   const lbImg = lb.querySelector('img');
-  lb.addEventListener('click', () => lb.classList.remove('open'));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+  const lbCaption = lb.querySelector('.lb-caption');
+  const lbCounter = lb.querySelector('.lb-counter');
+  let lbPhotos = [], lbIndex = 0;
+
+  function showLb(index) {
+    lbIndex = index;
+    const p = lbPhotos[index];
+    lbImg.src = p.full;
+    lbCaption.textContent = p.title;
+    lbCounter.textContent = `${index + 1} / ${lbPhotos.length}`;
+    lb.classList.add('open');
+  }
+
+  lb.addEventListener('click', e => {
+    if (!e.target.closest('.lb-nav') && e.target.tagName !== 'IMG') lb.classList.remove('open');
+  });
+  lb.querySelector('.lb-prev').addEventListener('click', e => { e.stopPropagation(); showLb((lbIndex - 1 + lbPhotos.length) % lbPhotos.length); });
+  lb.querySelector('.lb-next').addEventListener('click', e => { e.stopPropagation(); showLb((lbIndex + 1) % lbPhotos.length); });
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') lb.classList.remove('open');
+    if (e.key === 'ArrowLeft') showLb((lbIndex - 1 + lbPhotos.length) % lbPhotos.length);
+    if (e.key === 'ArrowRight') showLb((lbIndex + 1) % lbPhotos.length);
+  });
+
+  let touchStartX = 0;
+  lb.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; }, {passive:true});
+  lb.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) {
+      if (dx > 0) showLb((lbIndex - 1 + lbPhotos.length) % lbPhotos.length);
+      else showLb((lbIndex + 1) % lbPhotos.length);
+    }
+  });
 
   document.querySelectorAll('.gallery-section[data-tag]').forEach(section => {
     const tag = section.dataset.tag;
@@ -1173,26 +1241,42 @@
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => {
         section.classList.remove('loading');
-        (data.resources || []).forEach(img => {
+        const resources = data.resources || [];
+        if (!resources.length) { section.remove(); return; }
+        const photos = resources.map(img => {
           const parts = img.public_id.split('/');
           const raw = parts[parts.length - 1];
           const title = raw.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          return {
+            thumb: `https://res.cloudinary.com/${CLOUD}/image/upload/c_fill,w_400,h_400,q_auto,f_auto/${img.public_id}.${img.format}`,
+            full: `https://res.cloudinary.com/${CLOUD}/image/upload/c_limit,w_1600,q_auto,f_auto/${img.public_id}.${img.format}`,
+            title
+          };
+        });
+        photos.forEach((p, i) => {
           const fig = document.createElement('figure');
+          if (i >= VISIBLE_COUNT) fig.classList.add('hidden');
           const el = document.createElement('img');
-          el.src = `https://res.cloudinary.com/${CLOUD}/image/upload/c_fill,w_280,h_200,q_auto,f_auto/${img.public_id}.${img.format}`;
-          el.alt = title;
+          el.src = p.thumb;
+          el.alt = p.title;
           el.loading = 'lazy';
-          el.addEventListener('click', () => {
-            lbImg.src = `https://res.cloudinary.com/${CLOUD}/image/upload/c_limit,w_1600,q_auto,f_auto/${img.public_id}.${img.format}`;
-            lb.classList.add('open');
-          });
+          el.addEventListener('click', () => { lbPhotos = photos; showLb(i); });
           const cap = document.createElement('figcaption');
-          cap.textContent = title;
+          cap.textContent = p.title;
           fig.appendChild(el);
           fig.appendChild(cap);
           gallery.appendChild(fig);
         });
-        if (!data.resources || !data.resources.length) section.remove();
+        if (photos.length > VISIBLE_COUNT) {
+          const btn = document.createElement('button');
+          btn.className = 'gallery-more';
+          btn.textContent = `Voir les ${photos.length - VISIBLE_COUNT} autres photos`;
+          btn.addEventListener('click', () => {
+            gallery.querySelectorAll('.hidden').forEach(f => f.classList.remove('hidden'));
+            btn.remove();
+          });
+          gallery.after(btn);
+        }
       })
       .catch(() => section.remove());
   });
