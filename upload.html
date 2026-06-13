@@ -90,6 +90,26 @@
     margin-top:16px;text-align:center;
     font-size:.85rem;color:var(--teal);font-weight:500;
   }
+  .separator{
+    margin:36px 0 24px;border:none;border-top:1px solid var(--line);
+  }
+  textarea{
+    width:100%;padding:12px 14px;border:1px solid var(--line);
+    border-radius:10px;background:var(--paper);color:var(--ink);
+    font:inherit;font-size:.95rem;resize:vertical;min-height:100px;
+  }
+  textarea:focus{outline:2px solid var(--teal);outline-offset:1px}
+  textarea::placeholder{color:var(--muted)}
+  .post-list{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .post-item{
+    background:var(--paper);border:1px solid var(--line);
+    border-radius:10px;padding:12px 14px;
+  }
+  .post-item .post-text{font-size:.9rem;margin:0 0 6px;white-space:pre-wrap}
+  .post-item .post-meta{font-size:.72rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+  .post-item .delete-btn{
+    background:none;border:none;color:#c0392b;cursor:pointer;font-size:.72rem;padding:2px 6px;
+  }
 </style>
 </head>
 <body>
@@ -124,8 +144,24 @@
   </div>
 
   <div class="queue" id="queue"></div>
-  <button class="btn" id="upload-btn" disabled>Envoyer</button>
+  <button class="btn" id="upload-btn" disabled>Envoyer les photos</button>
   <div class="summary" id="summary"></div>
+
+  <hr class="separator">
+
+  <label for="author">Auteur</label>
+  <select id="author">
+    <option value="Perrine">Perrine</option>
+    <option value="Jérôme">Jérôme</option>
+    <option value="Eliott">Eliott</option>
+    <option value="Simon">Simon</option>
+  </select>
+
+  <label for="post-text" style="margin-top:16px">Publier un texte</label>
+  <textarea id="post-text" placeholder="Raconte ce qu'il se passe..."></textarea>
+  <button class="btn" id="post-btn">Publier</button>
+  <div class="summary" id="post-summary"></div>
+  <div class="post-list" id="post-list"></div>
 </div>
 
 <script>
@@ -219,6 +255,73 @@ btn.addEventListener('click', async () => {
 
   pending = [];
   summary.textContent = `${ok} photo(s) envoyée(s)` + (fail ? `, ${fail} erreur(s)` : '');
+});
+
+// ---- Firebase posts ----
+const FB = 'https://scotland-e21ec-default-rtdb.europe-west1.firebasedatabase.app';
+const postText = document.getElementById('post-text');
+const postBtn = document.getElementById('post-btn');
+const postSummary = document.getElementById('post-summary');
+const postList = document.getElementById('post-list');
+const tagSelect = document.getElementById('tag');
+
+function loadPosts() {
+  const tag = tagSelect.value;
+  postList.innerHTML = '';
+  fetch(`${FB}/posts/${tag}.json`)
+    .then(r => r.json())
+    .then(data => {
+      if (!data) return;
+      Object.entries(data)
+        .sort((a, b) => b[1].ts - a[1].ts)
+        .forEach(([key, post]) => {
+          const d = new Date(post.ts);
+          const date = d.toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+          postList.insertAdjacentHTML('beforeend', `
+            <div class="post-item">
+              <p class="post-text">${escHtml(post.text)}</p>
+              <div class="post-meta">
+                <span>${post.author || ''} · ${date}</span>
+                <button class="delete-btn" data-tag="${tag}" data-key="${key}">supprimer</button>
+              </div>
+            </div>
+          `);
+        });
+    });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+tagSelect.addEventListener('change', loadPosts);
+loadPosts();
+
+postBtn.addEventListener('click', async () => {
+  const text = postText.value.trim();
+  if (!text) return;
+  postBtn.disabled = true;
+  const tag = tagSelect.value;
+  try {
+    await fetch(`${FB}/posts/${tag}.json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, ts: Date.now(), author: document.getElementById('author').value })
+    });
+    postText.value = '';
+    postSummary.textContent = 'Publié !';
+    loadPosts();
+  } catch (e) {
+    postSummary.textContent = 'Erreur...';
+  }
+  postBtn.disabled = false;
+});
+
+postList.addEventListener('click', async e => {
+  if (!e.target.classList.contains('delete-btn')) return;
+  const { tag, key } = e.target.dataset;
+  await fetch(`${FB}/posts/${tag}/${key}.json`, { method: 'DELETE' });
+  loadPosts();
 });
 </script>
 </body>
