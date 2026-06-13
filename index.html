@@ -912,20 +912,26 @@
     };
     legend.addTo(map);
 
-    const allPts = stops.map(s => [s.lat, s.lng]);
-    allPts.push([ARMADALE.lat, ARMADALE.lng]);
-    map.fitBounds(L.latLngBounds(allPts), { padding:[40,40] });
     // ensure correct sizing once layout/fonts settle
     setTimeout(() => map.invalidateSize(), 250);
     window.addEventListener('load', () => map.invalidateSize());
 
-    // ---- Live position from Firebase ----
+    // ---- Live position from Firebase → zoom on it ----
+    const allPts = stops.map(s => [s.lat, s.lng]);
+    allPts.push([ARMADALE.lat, ARMADALE.lng]);
+
     fetch(`${FB}/location.json`)
       .then(r => r.json())
       .then(loc => {
-        if (!loc || !loc.lat) return;
+        if (!loc || !loc.lat) {
+          map.fitBounds(L.latLngBounds(allPts), { padding:[40,40] });
+          return;
+        }
         const age = Date.now() - loc.ts;
-        if (age > 48 * 3600 * 1000) return;
+        if (age > 48 * 3600 * 1000) {
+          map.fitBounds(L.latLngBounds(allPts), { padding:[40,40] });
+          return;
+        }
         const liveIcon = L.divIcon({
           className: '',
           html: '<div class="live-dot"></div>',
@@ -936,7 +942,13 @@
           : `il y a ${Math.round(age / 3600000)}h`;
         L.marker([loc.lat, loc.lng], { icon: liveIcon, zIndexOffset: 2000 })
           .addTo(map)
-          .bindPopup(`<b>Position actuelle</b><br><span class="pd">${ago}</span>`);
+          .bindPopup(`<b>Position actuelle</b><br><span class="pd">${ago}</span>`)
+          .openPopup();
+        const R = 50000;
+        map.fitBounds(L.latLng(loc.lat, loc.lng).toBounds(R * 2), { padding:[20,20] });
+      })
+      .catch(() => {
+        map.fitBounds(L.latLngBounds(allPts), { padding:[40,40] });
       });
   } else {
     document.getElementById('map').innerHTML =
