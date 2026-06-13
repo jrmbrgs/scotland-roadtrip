@@ -834,16 +834,10 @@
 
   if (window.L) {
     const map = L.map('map', { scrollWheelZoom:false });
-    const tiles1 = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution:'&copy; <a href="https://openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:'&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom:19
-    });
-    const tiles2 = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
-      attribution:'&copy; <a href="https://openstreetmap.org/copyright">OSM</a> &copy; <a href="https://stadiamaps.com">Stadia</a>',
-      maxZoom:19
-    });
-    L.control.layers({'Voyager': tiles1, 'Smooth': tiles2}, null, {position:'topright'}).addTo(map);
-    tiles1.addTo(map);
+    }).addTo(map);
 
     // ---- route segments: real driving routes + ferry crossing ----
     const driveStyle = { color:'#1F5C58', weight:4, opacity:.85, lineCap:'round', lineJoin:'round' };
