@@ -829,6 +829,7 @@
     {n:9,  name:"Aviemore",    d:"12 → 13 juil. · 1 nuit",    lat:57.1958, lng:-3.8253, start:"2026-07-12", end:"2026-07-13", id:"stop-9"},
     {n:10, name:"Édimbourg",   d:"13 → 14 juil. · 1 nuit",    lat:55.9533, lng:-3.1883, start:"2026-07-13", end:"2026-07-14", id:"stop-10"}
   ];
+  const FB = 'https://scotland-e21ec-default-rtdb.europe-west1.firebasedatabase.app';
   const mapToday = new Date().toISOString().slice(0, 10);
 
   if (window.L) {
@@ -999,7 +1000,6 @@
   }
 
   // ---- Firebase posts ----
-  const FB = 'https://scotland-e21ec-default-rtdb.europe-west1.firebasedatabase.app';
   const TAGS = ['depart','edinburgh','fort-william','mallaig','skye','ullapool','durness','dunnet','inverness','aviemore','edinburgh-retour','retour'];
   fetch(`${FB}/posts.json`)
     .then(r => r.json())
