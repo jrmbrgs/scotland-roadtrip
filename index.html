@@ -259,13 +259,21 @@
   .gallery::-webkit-scrollbar{height:5px}
   .gallery::-webkit-scrollbar-track{background:transparent}
   .gallery::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+  .gallery figure{
+    flex:none;scroll-snap-align:start;margin:0;
+    display:flex;flex-direction:column;gap:6px;
+  }
   .gallery img{
     height:160px;width:auto;aspect-ratio:auto;object-fit:cover;border-radius:10px;
     cursor:pointer;transition:transform .2s,box-shadow .2s;
-    background:var(--mist-2);flex:none;scroll-snap-align:start;
+    background:var(--mist-2);
     border:1px solid var(--line);
   }
   .gallery img:hover{transform:scale(1.04);box-shadow:0 4px 16px rgba(21,40,42,.12)}
+  .gallery figcaption{
+    font-size:.72rem;color:var(--muted);text-align:center;
+    max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
   .gallery-section.loading .gallery-title::after{
     content:" ·  chargement…";letter-spacing:0;text-transform:none;
     font-size:.72rem;color:var(--muted);
@@ -854,15 +862,23 @@
       .then(data => {
         section.classList.remove('loading');
         (data.resources || []).forEach(img => {
+          const parts = img.public_id.split('/');
+          const raw = parts[parts.length - 1];
+          const title = raw.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          const fig = document.createElement('figure');
           const el = document.createElement('img');
           el.src = `https://res.cloudinary.com/${CLOUD}/image/upload/c_fill,w_280,h_200,q_auto,f_auto/${img.public_id}.${img.format}`;
-          el.alt = img.public_id;
+          el.alt = title;
           el.loading = 'lazy';
           el.addEventListener('click', () => {
             lbImg.src = `https://res.cloudinary.com/${CLOUD}/image/upload/c_limit,w_1600,q_auto,f_auto/${img.public_id}.${img.format}`;
             lb.classList.add('open');
           });
-          gallery.appendChild(el);
+          const cap = document.createElement('figcaption');
+          cap.textContent = title;
+          fig.appendChild(el);
+          fig.appendChild(cap);
+          gallery.appendChild(fig);
         });
         if (!data.resources || !data.resources.length) section.remove();
       })

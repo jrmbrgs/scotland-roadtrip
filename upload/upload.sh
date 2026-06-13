@@ -31,8 +31,10 @@ for tag_dir in "$TOSEND_DIR"/*/; do
     esac
 
     filename=$(basename "$file")
+    name_no_ext="${filename%.*}"
+    public_id="${tag}/$(echo "$name_no_ext" | sed 's/ /-/g')"
     timestamp=$(date +%s)
-    signature=$(printf "tags=%s&timestamp=%s%s" "$tag" "$timestamp" "$API_SECRET" | shasum -a 1 | cut -d' ' -f1)
+    signature=$(printf "public_id=%s&tags=%s&timestamp=%s%s" "$public_id" "$tag" "$timestamp" "$API_SECRET" | shasum -a 1 | cut -d' ' -f1)
 
     response=$(curl -s -X POST \
       "https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload" \
@@ -40,7 +42,8 @@ for tag_dir in "$TOSEND_DIR"/*/; do
       -F "api_key=${API_KEY}" \
       -F "timestamp=${timestamp}" \
       -F "signature=${signature}" \
-      -F "tags=${tag}")
+      -F "tags=${tag}" \
+      -F "public_id=${public_id}")
 
     if echo "$response" | grep -q '"public_id"'; then
       mv "$file" "$SENT_DIR/$tag/"
