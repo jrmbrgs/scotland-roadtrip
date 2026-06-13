@@ -239,20 +239,36 @@
   .warn{color:var(--gold)}
 
   /* ---------- PHOTO GALLERY ---------- */
+  .gallery-section{
+    margin-top:20px;border-top:1px solid var(--line);padding-top:16px;
+  }
+  .gallery-title{
+    font-family:"Spline Sans Mono",monospace;
+    font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--teal-soft);margin:0 0 12px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .gallery-title::before{
+    content:"";display:block;width:18px;height:2px;background:var(--teal-soft);border-radius:1px;
+  }
   .gallery{
-    display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-    gap:8px;margin-top:16px;
+    display:flex;gap:10px;overflow-x:auto;
+    padding-bottom:8px;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
   }
+  .gallery::-webkit-scrollbar{height:5px}
+  .gallery::-webkit-scrollbar-track{background:transparent}
+  .gallery::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
   .gallery img{
-    width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;
-    cursor:pointer;transition:transform .2s;
-    background:var(--mist-2);
+    height:160px;width:auto;aspect-ratio:auto;object-fit:cover;border-radius:10px;
+    cursor:pointer;transition:transform .2s,box-shadow .2s;
+    background:var(--mist-2);flex:none;scroll-snap-align:start;
+    border:1px solid var(--line);
   }
-  .gallery img:hover{transform:scale(1.03)}
-  .gallery.loading::before{
-    content:"Chargement des photos…";
-    grid-column:1/-1;text-align:center;
-    font-size:.85rem;color:var(--muted);padding:12px 0;
+  .gallery img:hover{transform:scale(1.04);box-shadow:0 4px 16px rgba(21,40,42,.12)}
+  .gallery-section.loading .gallery-title::after{
+    content:" ·  chargement…";letter-spacing:0;text-transform:none;
+    font-size:.72rem;color:var(--muted);
   }
   .lightbox{
     position:fixed;inset:0;z-index:100;
@@ -358,7 +374,7 @@
         <h2>Départ de Nice</h2>
         <div class="meta"><span class="chip">27 juin</span><span class="chip nights">✈️ vol</span></div>
         <p class="trajet">✈️ <b>Vol</b> — Nice → Édimbourg</p>
-        <div class="gallery loading" data-tag="depart"></div>
+        <div class="gallery-section loading" data-tag="depart"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -384,7 +400,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Royal Botanic Garden</span> — <span class="note">calme, gratuit</span></span></li>
           </ul>
         </div>
-        <div class="gallery loading" data-tag="edinburgh"></div>
+        <div class="gallery-section loading" data-tag="edinburgh"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -414,7 +430,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Ben Nevis (au pied)</span> — <span class="note">+ front de loch / Old Fort</span></span></li>
           </ul>
         </div>
-        <div class="gallery loading" data-tag="fort-william"></div>
+        <div class="gallery-section loading" data-tag="fort-william"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -444,7 +460,7 @@
             <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Morar</span> — <span class="note">plages de sable blanc avant Mallaig</span></span></li>
           </ul>
         </div>
-        <div class="gallery loading" data-tag="mallaig"></div>
+        <div class="gallery-section loading" data-tag="mallaig"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -483,7 +499,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Dunvegan Castle &amp; jardins</span> — <span class="note">optionnel</span></span></li>
           </ul>
         </div>
-        <div class="gallery loading" data-tag="skye"></div>
+        <div class="gallery-section loading" data-tag="skye"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -513,7 +529,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Ullapool Museum</span> — <span class="note">histoire locale, ancienne église</span></span></li>
           </ul>
         </div>
-        <div class="gallery loading" data-tag="ullapool"></div>
+        <div class="gallery-section loading" data-tag="ullapool"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -543,7 +559,7 @@
             <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Balnakeil Beach</span></span></li>
           </ul>
         </div>
-        <div class="gallery loading" data-tag="durness"></div>
+        <div class="gallery-section loading" data-tag="durness"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -574,7 +590,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Phoques &amp; oiseaux marins</span></span></li>
           </ul>
         </div>
-        <div class="gallery loading" data-tag="dunnet"></div>
+        <div class="gallery-section loading" data-tag="dunnet"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -611,7 +627,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Parcs, rivière</span></span></li>
           </ul>
         </div>
-        <div class="gallery loading" data-tag="inverness"></div>
+        <div class="gallery-section loading" data-tag="inverness"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -641,7 +657,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Landmark Forest Adventure Park</span> — <span class="note">activités famille</span></span></li>
           </ul>
         </div>
-        <div class="gallery loading" data-tag="aviemore"></div>
+        <div class="gallery-section loading" data-tag="aviemore"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -671,7 +687,7 @@
             <li class="note-only" data-prio="1"><span class="stars">★</span><span class="it-body">Ce qui n'a pas pu être fait à l'étape 1 (Holyrood, Dean Village, Calton Hill…)</span></li>
           </ul>
         </div>
-        <div class="gallery loading" data-tag="edinburgh-retour"></div>
+        <div class="gallery-section loading" data-tag="edinburgh-retour"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -684,7 +700,7 @@
         <h2>Retour à Nice</h2>
         <div class="meta"><span class="chip">14 juillet</span><span class="chip nights">✈️ vol</span></div>
         <p class="trajet">✈️ <b>Vol</b> — Édimbourg → Nice</p>
-        <div class="gallery loading" data-tag="retour"></div>
+        <div class="gallery-section loading" data-tag="retour"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -830,15 +846,16 @@
   lb.addEventListener('click', () => lb.classList.remove('open'));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
 
-  document.querySelectorAll('.gallery[data-tag]').forEach(gallery => {
-    const tag = gallery.dataset.tag;
+  document.querySelectorAll('.gallery-section[data-tag]').forEach(section => {
+    const tag = section.dataset.tag;
+    const gallery = section.querySelector('.gallery');
     fetch(`https://res.cloudinary.com/${CLOUD}/image/list/${tag}.json`)
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => {
-        gallery.classList.remove('loading');
+        section.classList.remove('loading');
         (data.resources || []).forEach(img => {
           const el = document.createElement('img');
-          el.src = `https://res.cloudinary.com/${CLOUD}/image/upload/c_fill,w_400,h_300,q_auto,f_auto/${img.public_id}.${img.format}`;
+          el.src = `https://res.cloudinary.com/${CLOUD}/image/upload/c_fill,w_280,h_200,q_auto,f_auto/${img.public_id}.${img.format}`;
           el.alt = img.public_id;
           el.loading = 'lazy';
           el.addEventListener('click', () => {
@@ -847,9 +864,9 @@
           });
           gallery.appendChild(el);
         });
-        if (!data.resources || !data.resources.length) gallery.remove();
+        if (!data.resources || !data.resources.length) section.remove();
       })
-      .catch(() => gallery.remove());
+      .catch(() => section.remove());
   });
 </script>
 </body>
