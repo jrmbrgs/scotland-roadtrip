@@ -295,6 +295,25 @@
   }
   .post-bubble p{margin:0;font-size:.88rem;white-space:pre-wrap;line-height:1.5}
   .post-bubble .post-date{font-size:.7rem;color:var(--muted);margin-top:6px}
+  .post-replies{margin:6px 0 0;padding-left:14px;border-left:2px solid var(--mist-2)}
+  .post-reply{margin:6px 0;font-size:.82rem}
+  .post-reply .reply-author{font-weight:500;color:var(--teal)}
+  .post-reply .reply-date{font-size:.68rem;color:var(--muted);margin-left:6px}
+  .reply-form{display:flex;gap:6px;margin-top:8px}
+  .reply-form input{
+    flex:1;padding:6px 10px;border:1px solid var(--line);border-radius:6px;
+    font:inherit;font-size:.8rem;background:var(--paper);color:var(--ink);min-width:0;
+  }
+  .reply-form input:focus{outline:1px solid var(--teal);border-color:var(--teal)}
+  .reply-form button{
+    flex:none;padding:6px 12px;border:none;border-radius:6px;
+    background:var(--teal);color:#fff;font-size:.75rem;font-weight:600;cursor:pointer;
+  }
+  .reply-toggle{
+    background:none;border:none;color:var(--muted);font-size:.72rem;
+    cursor:pointer;padding:0;margin-top:4px;
+  }
+  .reply-toggle:hover{color:var(--teal)}
   .gallery-section{
     margin-top:20px;border-top:1px solid var(--line);padding-top:16px;
   }
@@ -1062,6 +1081,16 @@
 
   // ---- Firebase posts ----
   const TAGS = ['depart','edinburgh','fort-william','mallaig','skye','ullapool','durness','dunnet','inverness','aviemore','edinburgh-retour','retour'];
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  function fmtDate(ts){return new Date(ts).toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+
+  function renderReplies(replies){
+    if(!replies)return '';
+    return '<div class="post-replies">'+Object.values(replies).sort((a,b)=>a.ts-b.ts).map(r=>
+      `<div class="post-reply"><span class="reply-author">${esc(r.name)}</span><span class="reply-date">${fmtDate(r.ts)}</span><br>${esc(r.text)}</div>`
+    ).join('')+'</div>';
+  }
+
   fetch(`${FB}/posts.json`)
     .then(r => r.json())
     .then(allPosts => {
@@ -1071,19 +1100,61 @@
         if (!posts) return;
         const section = document.querySelector(`.gallery-section[data-tag="${tag}"]`);
         if (!section) return;
-        const sorted = Object.values(posts).sort((a, b) => a.ts - b.ts);
+        const sorted = Object.entries(posts).sort((a, b) => a[1].ts - b[1].ts);
         const div = document.createElement('div');
         div.className = 'posts-section';
         div.innerHTML = '<p class="posts-title">Journal</p>' +
-          sorted.map(p => {
-            const d = new Date(p.ts);
-            const date = d.toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
-            const text = p.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            return `<div class="post-bubble"><p>${text}</p><div class="post-date">${p.author ? p.author + ' · ' : ''}${date}</div></div>`;
+          sorted.map(([key, p]) => {
+            const text = esc(p.text);
+            const date = fmtDate(p.ts);
+            const replies = renderReplies(p.replies);
+            return `<div class="post-bubble" data-tag="${tag}" data-key="${key}">
+              <p>${text}</p>
+              <div class="post-date">${p.author ? p.author + ' · ' : ''}${date}</div>
+              ${replies}
+              <button class="reply-toggle">Répondre</button>
+              <div class="reply-form" style="display:none">
+                <input type="text" placeholder="Ton prénom" class="reply-name" maxlength="20">
+                <input type="text" placeholder="Ta réponse..." class="reply-text">
+                <button class="reply-send">Envoyer</button>
+              </div>
+            </div>`;
           }).join('');
         section.parentNode.insertBefore(div, section);
       });
     });
+
+  document.addEventListener('click', async e => {
+    if (e.target.classList.contains('reply-toggle')) {
+      const form = e.target.nextElementSibling;
+      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+      if (form.style.display === 'flex') form.querySelector('.reply-name').focus();
+    }
+    if (e.target.classList.contains('reply-send')) {
+      const form = e.target.closest('.reply-form');
+      const bubble = e.target.closest('.post-bubble');
+      const name = form.querySelector('.reply-name').value.trim();
+      const text = form.querySelector('.reply-text').value.trim();
+      if (!name || !text) return;
+      const {tag, key} = bubble.dataset;
+      await fetch(`${FB}/posts/${tag}/${key}/replies.json`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({name, text, ts:Date.now()})
+      });
+      const repliesDiv = bubble.querySelector('.post-replies') || document.createElement('div');
+      if (!repliesDiv.classList.contains('post-replies')) {
+        repliesDiv.className = 'post-replies';
+        bubble.querySelector('.reply-toggle').before(repliesDiv);
+      }
+      repliesDiv.insertAdjacentHTML('beforeend',
+        `<div class="post-reply"><span class="reply-author">${esc(name)}</span><span class="reply-date">à l'instant</span><br>${esc(text)}</div>`
+      );
+      form.querySelector('.reply-name').value = '';
+      form.querySelector('.reply-text').value = '';
+      form.style.display = 'none';
+    }
+  });
 
   // ---- Cloudinary photo galleries ----
   const CLOUD = 'brgsjrm';
