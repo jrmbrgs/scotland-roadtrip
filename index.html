@@ -374,6 +374,9 @@
     border-radius:10px;cursor:pointer;text-align:center;transition:.2s;
   }
   .gallery-more:hover{background:var(--mist-2)}
+  .empty-msg{
+    font-size:.8rem;color:var(--muted);font-style:italic;padding:8px 0;
+  }
   .gallery-section.loading .gallery-title::after{
     content:" ·  chargement…";letter-spacing:0;text-transform:none;
     font-size:.72rem;color:var(--muted);
@@ -1178,32 +1181,34 @@
   fetch(`${FB}/posts.json`)
     .then(r => r.json())
     .then(allPosts => {
-      if (!allPosts) return;
       TAGS.forEach(tag => {
-        const posts = allPosts[tag];
-        if (!posts) return;
         const section = document.querySelector(`.gallery-section[data-tag="${tag}"]`);
         if (!section) return;
-        const sorted = Object.entries(posts).sort((a, b) => a[1].ts - b[1].ts);
         const div = document.createElement('div');
         div.className = 'posts-section';
-        div.innerHTML = '<p class="posts-title">Journal</p>' +
-          sorted.map(([key, p]) => {
-            const text = esc(p.text);
-            const date = fmtDate(p.ts);
-            const replies = renderReplies(p.replies);
-            return `<div class="post-bubble" data-tag="${tag}" data-key="${key}">
-              <p>${text}</p>
-              <div class="post-date">${p.author ? '<span class="post-author">' + esc(p.author) + '</span> · ' : ''}${date}</div>
-              ${replies}
-              <button class="reply-toggle">Répondre</button>
-              <div class="reply-form" style="display:none">
-                <input type="text" placeholder="Ton prénom" class="reply-name" maxlength="20">
-                <input type="text" placeholder="Ta réponse..." class="reply-text">
-                <button class="reply-send">Envoyer</button>
-              </div>
-            </div>`;
-          }).join('');
+        const posts = allPosts && allPosts[tag];
+        if (posts) {
+          const sorted = Object.entries(posts).sort((a, b) => a[1].ts - b[1].ts);
+          div.innerHTML = '<p class="posts-title">Journal</p>' +
+            sorted.map(([key, p]) => {
+              const text = esc(p.text);
+              const date = fmtDate(p.ts);
+              const replies = renderReplies(p.replies);
+              return `<div class="post-bubble" data-tag="${tag}" data-key="${key}">
+                <p>${text}</p>
+                <div class="post-date">${p.author ? '<span class="post-author">' + esc(p.author) + '</span> · ' : ''}${date}</div>
+                ${replies}
+                <button class="reply-toggle">Répondre</button>
+                <div class="reply-form" style="display:none">
+                  <input type="text" placeholder="Ton prénom" class="reply-name" maxlength="20">
+                  <input type="text" placeholder="Ta réponse..." class="reply-text">
+                  <button class="reply-send">Envoyer</button>
+                </div>
+              </div>`;
+            }).join('');
+        } else {
+          div.innerHTML = '<p class="posts-title">Journal</p><p class="empty-msg">Rien de neuf pour le moment…</p>';
+        }
         section.parentNode.insertBefore(div, section);
       });
     });
@@ -1290,7 +1295,10 @@
       .then(data => {
         section.classList.remove('loading');
         const resources = data.resources || [];
-        if (!resources.length) { section.remove(); return; }
+        if (!resources.length) {
+          gallery.insertAdjacentHTML('afterend', '<p class="empty-msg">Pas encore de photos…</p>');
+          return;
+        }
         const photos = resources.map(img => {
           const parts = img.public_id.split('/');
           const raw = parts[parts.length - 1];
@@ -1326,7 +1334,10 @@
           gallery.after(btn);
         }
       })
-      .catch(() => section.remove());
+      .catch(() => {
+        section.classList.remove('loading');
+        gallery.insertAdjacentHTML('afterend', '<p class="empty-msg">Pas encore de photos…</p>');
+      });
   }
 
   const galObs = new IntersectionObserver((entries) => {
