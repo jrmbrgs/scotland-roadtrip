@@ -107,8 +107,25 @@
   }
   .post-item .post-text{font-size:.9rem;margin:0 0 6px;white-space:pre-wrap}
   .post-item .post-meta{font-size:.72rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
-  .post-item .delete-btn{
-    background:none;border:none;color:#c0392b;cursor:pointer;font-size:.72rem;padding:2px 6px;
+  .post-item .post-actions{display:flex;gap:8px}
+  .post-item .edit-btn,.post-item .delete-btn{
+    background:none;border:none;cursor:pointer;font-size:.72rem;padding:2px 6px;
+  }
+  .post-item .edit-btn{color:var(--teal)}
+  .post-item .delete-btn{color:#c0392b}
+  .post-item .edit-area{
+    width:100%;padding:8px;border:1px solid var(--teal);border-radius:6px;
+    font:inherit;font-size:.85rem;resize:vertical;min-height:60px;margin:6px 0;
+  }
+  .post-item .edit-actions{display:flex;gap:8px;justify-content:flex-end}
+  .post-item .save-btn,.post-item .cancel-btn{
+    padding:4px 12px;border-radius:6px;border:none;cursor:pointer;font-size:.75rem;font-weight:600;
+  }
+  .post-item .save-btn{background:var(--teal);color:#fff}
+  .post-item .cancel-btn{background:var(--mist-2);color:var(--muted)}
+  .post-tag{
+    font-family:"Spline Sans Mono",monospace;font-size:.65rem;
+    padding:2px 6px;border-radius:4px;background:var(--mist-2);color:var(--teal);
   }
   .gps-btn{
     display:block;width:100%;margin-top:16px;padding:14px;
@@ -173,13 +190,17 @@
   <textarea id="post-text" placeholder="Raconte ce qu'il se passe..."></textarea>
   <button class="btn" id="post-btn">Publier</button>
   <div class="summary" id="post-summary"></div>
-  <div class="post-list" id="post-list"></div>
 
   <hr class="separator">
 
   <label>Position GPS</label>
   <button class="gps-btn" id="gps-btn">Partager ma position</button>
   <div class="gps-status" id="gps-status"></div>
+
+  <hr class="separator">
+
+  <label>Tous les messages</label>
+  <div class="post-list" id="all-posts"></div>
 </div>
 
 <script>
@@ -280,40 +301,53 @@ const FB = 'https://scotland-e21ec-default-rtdb.europe-west1.firebasedatabase.ap
 const postText = document.getElementById('post-text');
 const postBtn = document.getElementById('post-btn');
 const postSummary = document.getElementById('post-summary');
-const postList = document.getElementById('post-list');
+const allPostsList = document.getElementById('all-posts');
 const tagSelect = document.getElementById('tag');
 
-function loadPosts() {
-  const tag = tagSelect.value;
-  postList.innerHTML = '';
-  fetch(`${FB}/posts/${tag}.json`)
-    .then(r => r.json())
-    .then(data => {
-      if (!data) return;
-      Object.entries(data)
-        .sort((a, b) => b[1].ts - a[1].ts)
-        .forEach(([key, post]) => {
-          const d = new Date(post.ts);
-          const date = d.toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
-          postList.insertAdjacentHTML('beforeend', `
-            <div class="post-item">
-              <p class="post-text">${escHtml(post.text)}</p>
-              <div class="post-meta">
-                <span>${post.author || ''} · ${date}</span>
-                <button class="delete-btn" data-tag="${tag}" data-key="${key}">supprimer</button>
-              </div>
-            </div>
-          `);
-        });
-    });
-}
+const TAG_LABELS = {
+  depart:'Départ',edinburgh:'Édimbourg','fort-william':'Fort William',
+  mallaig:'Mallaig',skye:'Skye',ullapool:'Ullapool',durness:'Durness',
+  dunnet:'Dunnet',inverness:'Inverness',aviemore:'Aviemore',
+  'edinburgh-retour':'Édimbourg (retour)',retour:'Retour'
+};
 
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-tagSelect.addEventListener('change', loadPosts);
-loadPosts();
+function loadAllPosts() {
+  allPostsList.innerHTML = '';
+  fetch(`${FB}/posts.json`)
+    .then(r => r.json())
+    .then(allPosts => {
+      if (!allPosts) return;
+      const flat = [];
+      Object.entries(allPosts).forEach(([tag, posts]) => {
+        Object.entries(posts).forEach(([key, post]) => {
+          flat.push({ tag, key, ...post });
+        });
+      });
+      flat.sort((a, b) => b.ts - a.ts);
+      flat.forEach(post => {
+        const d = new Date(post.ts);
+        const date = d.toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+        allPostsList.insertAdjacentHTML('beforeend', `
+          <div class="post-item" data-tag="${post.tag}" data-key="${post.key}">
+            <p class="post-text">${escHtml(post.text)}</p>
+            <div class="post-meta">
+              <span><span class="post-tag">${TAG_LABELS[post.tag] || post.tag}</span> ${post.author || ''} · ${date}</span>
+              <div class="post-actions">
+                <button class="edit-btn">modifier</button>
+                <button class="delete-btn">supprimer</button>
+              </div>
+            </div>
+          </div>
+        `);
+      });
+    });
+}
+
+loadAllPosts();
 
 postBtn.addEventListener('click', async () => {
   const text = postText.value.trim();
@@ -328,18 +362,49 @@ postBtn.addEventListener('click', async () => {
     });
     postText.value = '';
     postSummary.textContent = 'Publié !';
-    loadPosts();
+    loadAllPosts();
   } catch (e) {
     postSummary.textContent = 'Erreur...';
   }
   postBtn.disabled = false;
 });
 
-postList.addEventListener('click', async e => {
-  if (!e.target.classList.contains('delete-btn')) return;
-  const { tag, key } = e.target.dataset;
-  await fetch(`${FB}/posts/${tag}/${key}.json`, { method: 'DELETE' });
-  loadPosts();
+allPostsList.addEventListener('click', async e => {
+  const item = e.target.closest('.post-item');
+  if (!item) return;
+  const { tag, key } = item.dataset;
+
+  if (e.target.classList.contains('delete-btn')) {
+    await fetch(`${FB}/posts/${tag}/${key}.json`, { method: 'DELETE' });
+    loadAllPosts();
+  }
+
+  if (e.target.classList.contains('edit-btn')) {
+    const textEl = item.querySelector('.post-text');
+    const current = textEl.textContent;
+    textEl.innerHTML = `<textarea class="edit-area">${escHtml(current)}</textarea>
+      <div class="edit-actions">
+        <button class="cancel-btn">annuler</button>
+        <button class="save-btn">enregistrer</button>
+      </div>`;
+  }
+
+  if (e.target.classList.contains('save-btn')) {
+    const textarea = item.querySelector('.edit-area');
+    const newText = textarea.value.trim();
+    if (newText) {
+      await fetch(`${FB}/posts/${tag}/${key}/text.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newText)
+      });
+    }
+    loadAllPosts();
+  }
+
+  if (e.target.classList.contains('cancel-btn')) {
+    loadAllPosts();
+  }
 });
 
 // ---- GPS ----
