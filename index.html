@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadtrip Écosse · 27 juin → 14 juillet</title>
+<meta name="description" content="Itinéraire détaillé d'un roadtrip de 10 étapes dans les Highlands écossais : dates, hébergements, activités notées par priorité et horaires.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root{
+    --ink:#15282A;
+    --teal:#1F5C58;
+    --teal-soft:#3a7d77;
+    --heather:#6c4f8c;
+    --gold:#bd8526;
+    --mist:#e8ebe3;
+    --mist-2:#dfe4da;
+    --paper:#fcfcf8;
+    --line:#cdd4cb;
+    --muted:#586460;
+    --r:16px;
+    --maxw:880px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--mist);
+    color:var(--ink);
+    font-family:"Inter",system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--teal);text-underline-offset:3px}
+  ::selection{background:var(--heather);color:#fff}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    align-items:flex-end;
+    min-height:clamp(380px,56vh,540px);
+    padding:72px 24px 40px;
+    background:
+      linear-gradient(180deg, rgba(16,34,36,.30) 0%, rgba(16,34,36,.55) 55%, rgba(13,30,31,.86) 100%),
+      #16383a url('https://images.unsplash.com/photo-1689756249310-7375ef4081d9?auto=format&fit=crop&w=1920&q=70') center 38% / cover no-repeat;
+    color:#f4f3ea;
+  }
+  .hero .contours{
+    position:absolute;inset:0;width:100%;height:100%;
+    opacity:.16;pointer-events:none;
+  }
+  .hero-inner{position:relative;width:100%;max-width:var(--maxw);margin:0 auto;text-shadow:0 1px 16px rgba(8,20,21,.45)}
+  .eyebrow{
+    font-family:"Spline Sans Mono",monospace;
+    font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;
+    color:#bfe0d6;margin:0 0 18px;
+  }
+  .hero h1{
+    font-family:"Fraunces",serif;
+    font-weight:500;
+    font-size:clamp(3rem,12vw,6.5rem);
+    line-height:.92;
+    margin:0;
+    letter-spacing:-.01em;
+  }
+  .hero h1 em{font-style:italic;font-weight:400;color:#e9c987}
+  .hero .sub{
+    margin:20px 0 0;
+    font-size:clamp(1rem,2.4vw,1.25rem);
+    max-width:42ch;color:#dfe7e0;
+  }
+  .stat-row{
+    display:flex;flex-wrap:wrap;gap:28px;margin-top:30px;
+    font-family:"Spline Sans Mono",monospace;
+  }
+  .stat .n{display:block;font-size:1.7rem;color:#fff;line-height:1}
+  .stat .l{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#a8c8be}
+
+  /* ---------- TOOLBAR ---------- */
+  .toolbar{
+    position:sticky;top:0;z-index:20;
+    background:rgba(232,235,227,.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .toolbar-inner{
+    max-width:var(--maxw);margin:0 auto;padding:12px 24px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:14px;justify-content:space-between;
+  }
+  .legend{font-size:.82rem;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+  .legend b{color:var(--gold);font-weight:600}
+  .filters{display:flex;gap:6px}
+  .filters button{
+    font:inherit;font-size:.8rem;
+    border:1px solid var(--line);background:var(--paper);color:var(--muted);
+    padding:6px 12px;border-radius:999px;cursor:pointer;transition:.18s;
+  }
+  .filters button:hover{border-color:var(--teal-soft);color:var(--ink)}
+  .filters button[aria-pressed="true"]{
+    background:var(--ink);border-color:var(--ink);color:#f4f3ea;
+  }
+  .filters button:focus-visible,a:focus-visible{outline:2px solid var(--heather);outline-offset:2px}
+
+  /* ---------- MAP ---------- */
+  .map-section{max-width:var(--maxw);margin:0 auto;padding:40px 24px 4px}
+  .map-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .map-head h2{
+    font-family:"Fraunces",serif;font-weight:500;font-size:1.5rem;margin:0;letter-spacing:-.01em;
+  }
+  .map-head p{margin:0;font-size:.82rem;color:var(--muted)}
+  #map{
+    height:440px;width:100%;border-radius:var(--r);
+    border:1px solid var(--line);
+    box-shadow:0 1px 2px rgba(21,40,42,.05);
+    background:var(--mist-2);z-index:1;
+  }
+  .map-pin{
+    width:30px;height:30px;border-radius:50% 50% 50% 0;
+    background:var(--teal);transform:rotate(-45deg);
+    border:2px solid #fff;box-shadow:0 2px 5px rgba(21,40,42,.35);
+    display:grid;place-items:center;
+  }
+  .map-pin span{
+    transform:rotate(45deg);color:#fff;font-family:"Spline Sans Mono",monospace;
+    font-size:.72rem;font-weight:600;
+  }
+  .map-pin.last{background:var(--heather)}
+  .leaflet-popup-content-wrapper{border-radius:10px}
+  .leaflet-popup-content{font-family:"Inter",sans-serif;margin:10px 13px;font-size:.85rem}
+  .leaflet-popup-content b{font-family:"Fraunces",serif;font-weight:500;font-size:1rem}
+  .leaflet-popup-content .pd{font-family:"Spline Sans Mono",monospace;font-size:.72rem;color:var(--muted)}
+  .leaflet-container{font-family:"Inter",sans-serif}
+  .map-legend{
+    background:rgba(252,252,248,.92);border:1px solid var(--line);border-radius:8px;
+    padding:7px 10px;font-size:.74rem;color:var(--muted);line-height:1.5;
+    box-shadow:0 1px 3px rgba(21,40,42,.12);
+  }
+  .map-legend i{display:inline-block;width:20px;height:0;vertical-align:middle;margin-right:5px}
+  .map-legend i.r{border-top:4px solid var(--teal)}
+  .map-legend i.f{border-top:3px dashed #2E86AB}
+
+  /* ---------- ROUTE / TIMELINE ---------- */
+  main{max-width:var(--maxw);margin:0 auto;padding:46px 24px 90px;position:relative}
+  .route{position:relative}
+  .route::before{
+    content:"";position:absolute;left:23px;top:8px;bottom:60px;width:2px;
+    background:linear-gradient(180deg,var(--teal),var(--heather));
+    opacity:.32;
+  }
+  .stop{position:relative;padding-left:64px;margin-bottom:34px}
+  .node{
+    position:absolute;left:0;top:2px;width:48px;height:48px;border-radius:50%;
+    background:var(--paper);border:2px solid var(--teal);
+    display:grid;place-items:center;
+    font-family:"Spline Sans Mono",monospace;font-size:.92rem;color:var(--teal);
+    box-shadow:0 2px 0 rgba(21,40,42,.06);
+  }
+  .stop:last-child .node{border-color:var(--heather);color:var(--heather)}
+
+  .card{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+    overflow:hidden;box-shadow:0 1px 2px rgba(21,40,42,.04);
+  }
+  .card-photo{
+    height:168px;background-size:cover;background-position:center;
+    background-color:var(--mist-2);border-bottom:1px solid var(--line);
+  }
+  .card-body{padding:22px 24px}
+  .card h2{
+    font-family:"Fraunces",serif;font-weight:500;
+    font-size:1.7rem;margin:0;line-height:1.1;letter-spacing:-.01em;
+  }
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 2px}
+  .chip{
+    font-family:"Spline Sans Mono",monospace;font-size:.74rem;letter-spacing:.02em;
+    padding:4px 9px;border-radius:7px;background:var(--mist-2);color:var(--muted);
+  }
+  .chip.nights{background:transparent;border:1px solid var(--line)}
+  .hotel{margin:12px 0 0;font-size:.92rem;color:var(--ink)}
+  .hotel .pin{color:var(--teal-soft)}
+  .hotel small{display:block;color:var(--muted);font-size:.85em}
+
+  .trajet{
+    margin:16px 0 0;font-size:.9rem;color:var(--muted);
+    border-top:1px dashed var(--line);padding-top:14px;
+  }
+  .trajet b{color:var(--ink);font-weight:600}
+
+  /* highlighted fixed-time appointments */
+  .rdv{
+    margin-top:16px;padding:14px 16px;border-radius:12px;
+    background:#f3eef7;border:1px solid #e1d5ee;
+  }
+  .rdv .rdv-h{
+    font-weight:600;color:var(--heather);font-size:.92rem;margin:0 0 6px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .rdv ul{margin:0;padding-left:18px;font-size:.86rem;color:var(--muted)}
+  .rdv li{margin:3px 0}
+  .rdv strong{color:var(--ink)}
+
+  /* blocks: sur la route / sur place */
+  .block{margin-top:18px}
+  .block-h{
+    display:flex;align-items:center;gap:9px;
+    font-family:"Spline Sans Mono",monospace;
+    font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;
+    margin:0 0 10px;
+  }
+  .block-h .tag{width:9px;height:9px;border-radius:2px;flex:none}
+  .block.route-b .block-h{color:var(--teal)}
+  .block.route-b .tag{background:var(--teal)}
+  .block.place-b .block-h{color:var(--heather)}
+  .block.place-b .tag{background:var(--heather)}
+
+  ul.items{list-style:none;margin:0;padding:0}
+  ul.items li{
+    display:flex;gap:12px;align-items:baseline;
+    padding:8px 0;border-bottom:1px solid #eef0ea;
+  }
+  ul.items li:last-child{border-bottom:none}
+  .stars{
+    flex:none;font-size:.82rem;color:var(--gold);letter-spacing:1px;
+    min-width:42px;line-height:1.4;
+  }
+  .stars .off{color:#dcdcd2}
+  .it-body{flex:1}
+  .it-body .name{font-weight:500}
+  .it-body .note{color:var(--muted);font-size:.86em}
+  li.note-only{color:var(--muted);font-style:italic;font-size:.9rem}
+  li.note-only .stars{visibility:hidden}
+
+  .warn{color:var(--gold)}
+
+  /* sub-notes inside an item (Glenfinnan) */
+  .subnotes{margin:6px 0 0;padding-left:0;list-style:none;
+    font-size:.82rem;color:var(--muted);border-left:2px solid var(--mist-2);padding-left:12px}
+  .subnotes li{display:block;border:none;padding:2px 0}
+  .subnotes strong{color:var(--ink)}
+
+  /* ---------- FILTER STATES ---------- */
+  body.f3 ul.items li[data-prio="2"],
+  body.f3 ul.items li[data-prio="1"],
+  body.f23 ul.items li[data-prio="1"]{display:none}
+  .block.is-empty{display:none}
+
+  footer{
+    max-width:var(--maxw);margin:0 auto;padding:0 24px 70px;color:var(--muted);
+    font-size:.85rem;
+  }
+  footer .rule{height:1px;background:var(--line);margin:0 0 22px}
+
+  /* ---------- ANIM ---------- */
+  .stop{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+  .stop.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){
+    .stop{opacity:1;transform:none;transition:none}
+    html{scroll-behavior:auto}
+  }
+
+  @media (max-width:560px){
+    .hero{padding:56px 18px 32px}
+    main{padding:34px 16px 70px}
+    .stop{padding-left:54px}
+    .node{width:42px;height:42px;font-size:.82rem}
+    .route::before{left:20px}
+    .card-body{padding:18px}
+    .card-photo{height:130px}
+    #map{height:320px}
+    .map-section{padding:30px 16px 0}
+  }
+  @media print{
+    .toolbar,.hero .contours,.map-section,.card-photo{display:none}
+    body{background:#fff}
+    .stop{opacity:1;transform:none;break-inside:avoid}
+    .hero{background:#fff;color:#000;padding:20px 0}
+    .hero h1 em{color:#000}
+  }
+</style>
+</head>
+<body class="f-all">
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Roadtrip · 2026</p>
+    <h1>Highlands<br><em>d'Écosse</em></h1>
+    <p class="sub">Du château d'Édimbourg au point le plus au nord de la Grande-Bretagne, puis retour par les Cairngorms.</p>
+    <div class="stat-row">
+      <div class="stat"><span class="n">10</span><span class="l">étapes</span></div>
+      <div class="stat"><span class="n">18</span><span class="l">jours</span></div>
+      <div class="stat"><span class="n">27 juin</span><span class="l">→ 14 juillet</span></div>
+    </div>
+  </div>
+</header>
+
+<section class="map-section">
+  <div class="map-head">
+    <h2>L'itinéraire en un coup d'œil</h2>
+    <p>Trajet routier réel · ferry en pointillés · cliquez sur une étape</p>
+  </div>
+  <div id="map"></div>
+</section>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <div class="legend">
+      <span><b>★★★</b> incontournable</span>
+      <span><b>★★</b> recommandé</span>
+      <span><b>★</b> si le temps le permet</span>
+    </div>
+    <div class="filters" role="group" aria-label="Filtrer par priorité">
+      <button data-f="all" aria-pressed="true">Tout</button>
+      <button data-f="f23" aria-pressed="false">★★+</button>
+      <button data-f="f3" aria-pressed="false">★★★</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="route">
+
+    <!-- 1 -->
+    <section class="stop">
+      <div class="node">01</div>
+      <article class="card">
+        <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1557096002-7f215e6b5dcf?auto=format&fit=crop&w=1000&q=70')"></div>
+        <div class="card-body">
+        <h2>Édimbourg</h2>
+        <div class="meta"><span class="chip">27 → 29 juin</span><span class="chip nights">2 nuits</span></div>
+        <p class="hotel"><span class="pin">🏨</span> Caravel / Atlas Guest House<small>30 London St, Edinburgh EH3 6NA</small></p>
+        <div class="block place-b">
+          <p class="block-h"><span class="tag"></span> Sur place</p>
+          <ul class="items">
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Château d'Édimbourg</span> — <span class="note">réserver en ligne, arriver tôt</span></span></li>
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Royal Mile</span> — <span class="note">du château à Holyrood, closes et ruelles</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">National Museum of Scotland</span> — <span class="note">gratuit, terrasse avec vue</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Arthur's Seat</span> — <span class="note">courte rando, panorama</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Calton Hill</span> — <span class="note">vue au coucher du soleil</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Scotch Whisky Experience</span> — <span class="note">dégustation</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Royal Botanic Garden</span> — <span class="note">calme, gratuit</span></span></li>
+          </ul>
+        </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 2 -->
+    <section class="stop">
+      <div class="node">02</div>
+      <article class="card">
+        <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1657023420501-cf3936cb3039?auto=format&fit=crop&w=1000&q=70')"></div>
+        <div class="card-body">
+        <h2>Fort William</h2>
+        <div class="meta"><span class="chip">29 → 30 juin</span><span class="chip nights">1 nuit</span></div>
+        <p class="hotel"><span class="pin">🏨</span> Family Friendly Apartment<small>Fort William — adresse exacte sur la confirmation Booking</small></p>
+        <p class="trajet">🚗 <b>Trajet</b> — Édimbourg → Fort William · ~4h</p>
+        <div class="block route-b">
+          <p class="block-h"><span class="tag"></span> Sur la route</p>
+          <ul class="items">
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Glencoe Viewpoint</span> — <span class="note">A82, vallée spectaculaire, parking gratuit</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Loch Lomond / Rannoch Moor</span> — <span class="note">paysages le long de l'A82</span></span></li>
+          </ul>
+        </div>
+        <div class="block place-b">
+          <p class="block-h"><span class="tag"></span> Sur place</p>
+          <ul class="items">
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Nevis Range Gondola</span> — <span class="note">téléphérique, vues + café au sommet</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Steall Falls, Glen Nevis</span> — <span class="note">rando ~1h30, pont de câbles</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Ben Nevis (au pied)</span> — <span class="note">+ front de loch / Old Fort</span></span></li>
+          </ul>
+        </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 3 -->
+    <section class="stop">
+      <div class="node">03</div>
+      <article class="card">
+        <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1700159411878-bb8bb3301bed?auto=format&fit=crop&w=1000&q=70')"></div>
+        <div class="card-body">
+        <h2>Mallaig</h2>
+        <div class="meta"><span class="chip">30 juin → 1 juil.</span><span class="chip nights">1 nuit</span></div>
+        <p class="hotel"><span class="pin">🏨</span> Fair Winds B&amp;B <small>Morar PH40 4PD · chez Janet · ⚠️ départ tôt, ferry à 8h45</small></p>
+        <p class="trajet">🚗 <b>Trajet</b> — Fort William → Mallaig (Road to the Isles) · ~2h</p>
+        <div class="block route-b">
+          <p class="block-h"><span class="tag"></span> Sur la route</p>
+          <ul class="items">
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Glenfinnan Viaduct</span> — <span class="note">Harry Potter</span>
+              <ul class="subnotes">
+                <li>🚆 Train Jacobite sur le viaduc <strong>~11h07</strong></li>
+                <li>⏰ Arriver vers <strong>10h20</strong> (parking + 15-20 min de marche, en place pour 10h50)</li>
+                <li><span class="warn">⚠️</span> Parking plein dès 9h30 ; sinon spots le long de l'A830</li>
+                <li>2ᵉ passage l'après-midi ~13h40-14h (à confirmer · West Coast Railways)</li>
+              </ul>
+            </span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Plages d'Arisaig / Silver Sands</span> — <span class="note">sable blanc, vue sur Eigg &amp; Rum</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Morar</span> — <span class="note">plages de sable blanc avant Mallaig</span></span></li>
+          </ul>
+        </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 4 -->
+    <section class="stop">
+      <div class="node">04</div>
+      <article class="card">
+        <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1551801691-f0bce83d4f68?auto=format&fit=crop&w=1000&q=70')"></div>
+        <div class="card-body">
+        <h2>Île de Skye</h2>
+        <div class="meta"><span class="chip">1 → 5 juillet</span><span class="chip nights">4 nuits</span></div>
+        <p class="hotel"><span class="pin">🏨</span> The Rock — Dunvegan <small>1-4/7 (3 nuits) · adresse via Airbnb</small></p>
+        <p class="hotel"><span class="pin">🏨</span> The Cowshed Boutique Bunkhouse <small>4-5/7 (1 nuit) · Uig, Isle of Skye IV51 9YD</small></p>
+        <div class="rdv">
+          <p class="rdv-h">⏱️ Programme du 1ᵉʳ juillet — jour d'arrivée</p>
+          <ul>
+            <li><strong>~8h10</strong> départ B&amp;B (Morar, ~5 min de Mallaig)</li>
+            <li><strong>8h25</strong> check-in véhicule au terminal de Mallaig</li>
+            <li><strong>8h45</strong> ferry Mallaig → Armadale (~25-30 min, arrivée ~9h15)</li>
+            <li><strong>~9h15</strong> Armadale → Elgol, ~1h-1h15 (route étroite via Broadford), arrivée ~10h30</li>
+            <li><strong>12h</strong> croisière AquaXplore Elgol <em>(réservé)</em> — au port vers 11h40</li>
+          </ul>
+        </div>
+        <div class="block place-b">
+          <p class="block-h"><span class="tag"></span> Sur place · 4 jours</p>
+          <ul class="items">
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Old Man of Storr</span> — <span class="note">rando ~1h, raide mais accessible</span></span></li>
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Quiraing</span> — <span class="note">paysage lunaire, boucle ou viewpoint</span></span></li>
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Fairy Pools, Glenbrittle</span> — <span class="note">sentier ~5 km, chaussures de rando</span></span></li>
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Neist Point Lighthouse</span> — <span class="note">falaises, ~3 km A/R, sublime au coucher</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Kilt Rock &amp; Mealt Falls</span> — <span class="note">arrêt rapide en bord de route</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Fairy Glen, Uig</span> — <span class="note">petite balade, parking payant</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Sligachan Old Bridge</span> — <span class="note">vue sur les Cuillin</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Portree</span> — <span class="note">port coloré, fish &amp; chips, restos</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Dunvegan Castle &amp; jardins</span> — <span class="note">optionnel</span></span></li>
+          </ul>
+        </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 5 -->
+    <section class="stop">
+      <div class="node">05</div>
+      <article class="card">
+        <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1672929777497-7d8a4d14ca5b?auto=format&fit=crop&w=1000&q=70')"></div>
+        <div class="card-body">
+        <h2>Ullapool</h2>
+        <div class="meta"><span class="chip">5 → 6 juillet</span><span class="chip nights">1 nuit</span></div>
+        <p class="hotel"><span class="pin">🏨</span> The Arch Inn<small>10-11 West Shore St, Ullapool IV26 2UR</small></p>
+        <p class="trajet">🚗 <b>Trajet</b> — Skye → Ullapool · ~3h30-4h</p>
+        <div class="block route-b">
+          <p class="block-h"><span class="tag"></span> Sur la route</p>
+          <ul class="items">
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Eilean Donan Castle</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Corrieshalloch Gorge / Falls of Measach</span> — <span class="note">passerelle suspendue, café</span></span></li>
+          </ul>
+        </div>
+        <div class="block place-b">
+          <p class="block-h"><span class="tag"></span> Sur place</p>
+          <ul class="items">
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Promenade du port</span> — <span class="note">couchers de soleil sur Loch Broom</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Rhue Lighthouse</span> — <span class="note">courte balade, loutres possibles</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Ullapool Museum</span> — <span class="note">histoire locale, ancienne église</span></span></li>
+          </ul>
+        </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 6 -->
+    <section class="stop">
+      <div class="node">06</div>
+      <article class="card">
+        <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1659977193681-c40fa885527e?auto=format&fit=crop&w=1000&q=70')"></div>
+        <div class="card-body">
+        <h2>Durness</h2>
+        <div class="meta"><span class="chip">6 → 8 juillet</span><span class="chip nights">2 nuits</span></div>
+        <p class="hotel"><span class="pin">🏨</span> Wild Orchid Guest House<small>Durine, Durness IV27 4PN</small></p>
+        <p class="trajet">🚗 <b>Trajet</b> — Ullapool → Durness · ~3h30-4h · 👉 route superbe mais lente, prévoir des pauses</p>
+        <div class="block route-b">
+          <p class="block-h"><span class="tag"></span> Sur la route · 6 juil.</p>
+          <ul class="items">
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Plage Oldshoremore</span> — <span class="note">pause déj + après-midi</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Knockan Crag</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Allt Chranaidh Waterfall</span></span></li>
+          </ul>
+        </div>
+        <div class="block place-b">
+          <p class="block-h"><span class="tag"></span> Sur place · 7 juil.</p>
+          <ul class="items">
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Smoo Cave</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Balnakeil Beach</span></span></li>
+          </ul>
+        </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 7 -->
+    <section class="stop">
+      <div class="node">07</div>
+      <article class="card">
+        <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1603833723632-e110b5f9ad59?auto=format&fit=crop&w=1000&q=70')"></div>
+        <div class="card-body">
+        <h2>Dunnet</h2>
+        <div class="meta"><span class="chip">8 → 10 juillet</span><span class="chip nights">2 nuits</span></div>
+        <p class="hotel"><span class="pin">🏨</span> Sinclair Bay Lodges<small>Keiss, Wick KW1 4AT · ⚠️ côté Keiss/Wick, ~30 min à l'est de Dunnet Head — à vérifier</small></p>
+        <p class="trajet">🚗 <b>Trajet</b> — Durness → Dunnet · ~2h30</p>
+        <div class="block route-b">
+          <p class="block-h"><span class="tag"></span> Sur la route</p>
+          <ul class="items">
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Strathy Beach</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Melvich Bay</span></span></li>
+          </ul>
+        </div>
+        <div class="block place-b">
+          <p class="block-h"><span class="tag"></span> Sur place · « bout du monde »</p>
+          <ul class="items">
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Dunnet Head</span> — <span class="note">point le plus au nord de la Grande-Bretagne</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Dunnet Bay</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Castle of Mey</span> — <span class="note">vérifier ouverture : souvent fermé ~10 j fin juillet</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Phoques &amp; oiseaux marins</span></span></li>
+          </ul>
+        </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 8 -->
+    <section class="stop">
+      <div class="node">08</div>
+      <article class="card">
+        <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1689756249310-7375ef4081d9?auto=format&fit=crop&w=1000&q=70')"></div>
+        <div class="card-body">
+        <h2>Inverness</h2>
+        <div class="meta"><span class="chip">10 → 12 juillet</span><span class="chip nights">2 nuits</span></div>
+        <p class="hotel"><span class="pin">🏨</span> Langdale Lodge<small>Drummond Crescent, Inverness IV2 4QR</small></p>
+        <p class="trajet">🚗 <b>Trajet</b> — Dunnet → Inverness · ~3h · ➡️ facile, avec un gros arrêt en route</p>
+        <div class="rdv">
+          <p class="rdv-h">🐬 RDV dauphins — Chanonry Point · 10/7 à 20h</p>
+          <ul>
+            <li>🚗 Départ Langdale Lodge <strong>~19h00</strong> (Chanonry ~25-30 min via pont de Kessock + A832)</li>
+            <li><span class="warn">⚠️</span> Parking petit et vite plein → arriver tôt, courte marche jusqu'à la pointe</li>
+          </ul>
+        </div>
+        <div class="block route-b">
+          <p class="block-h"><span class="tag"></span> Sur la route</p>
+          <ul class="items">
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Wick</span> — <span class="note">St Clair Castle</span></span></li>
+            <li class="note-only" data-prio="1"><span class="stars">★</span><span class="it-body">Côte est plus douce (paysages)</span></li>
+          </ul>
+        </div>
+        <div class="block place-b">
+          <p class="block-h"><span class="tag"></span> Sur place</p>
+          <ul class="items">
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Chanonry Point (Black Isle)</span> — <span class="note">dauphins depuis la plage à marée montante</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Centre d'Inverness</span> — <span class="note">repos, glaces, restos</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Parcs, rivière</span></span></li>
+          </ul>
+        </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 9 -->
+    <section class="stop">
+      <div class="node">09</div>
+      <article class="card">
+        <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1657023420501-cf3936cb3039?auto=format&fit=crop&w=1000&q=70')"></div>
+        <div class="card-body">
+        <h2>Aviemore</h2>
+        <div class="meta"><span class="chip">12 → 13 juillet</span><span class="chip nights">1 nuit</span></div>
+        <p class="hotel"><span class="pin">🏨</span> Coylumbridge Resort Hotel<small>Coylumbridge, Aviemore PH22 1QN</small></p>
+        <p class="trajet">🚗 <b>Trajet</b> — Inverness → Aviemore · ~1h<br>🌅 Le 12/7 : départ ~9h30 → Cairngorm Reindeer Centre, Glenmore (~1h) pour le RDV de 11h, puis check-in.</p>
+        <div class="block route-b">
+          <p class="block-h"><span class="tag"></span> Sur la route</p>
+          <ul class="items">
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Forêts &amp; lochs du Cairngorms NP</span> — <span class="note">en arrivant</span></span></li>
+          </ul>
+        </div>
+        <div class="block place-b">
+          <p class="block-h"><span class="tag"></span> Sur place</p>
+          <ul class="items">
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Cairngorm Herd (rennes) · 12 à 11h</span> — <span class="note">au centre de Glenmore vers 10h40, Hill Trip</span></span></li>
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">Loch an Eilein / Rothiemurchus</span> — <span class="note">balade en forêt, château sur l'îlot</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Cairngorm Mountain</span> — <span class="note">funiculaire, vues sur le parc</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Landmark Forest Adventure Park</span> — <span class="note">activités famille</span></span></li>
+          </ul>
+        </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 10 -->
+    <section class="stop">
+      <div class="node">10</div>
+      <article class="card">
+        <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1648397831904-24e068d84b05?auto=format&fit=crop&w=1000&q=70')"></div>
+        <div class="card-body">
+        <h2>Édimbourg</h2>
+        <div class="meta"><span class="chip">13 → 14 juillet</span><span class="chip nights">1 nuit</span></div>
+        <p class="hotel"><span class="pin">🏨</span> Haymarket Hotel<small>11 Coates Gardens, Edinburgh EH12 5LG</small></p>
+        <p class="trajet">🚗 <b>Trajet</b> — Aviemore → Édimbourg · ~3h, axe A9</p>
+        <div class="block route-b">
+          <p class="block-h"><span class="tag"></span> Sur la route</p>
+          <ul class="items">
+            <li data-prio="3"><span class="stars">★★★</span><span class="it-body"><span class="name">The Hermitage, Dunkeld</span> — <span class="note">forêt, cascade, grands arbres</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Pitlochry</span> — <span class="note">barrage + échelle à saumons, distillerie Blair Athol</span></span></li>
+            <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Blair Castle &amp; jardins</span> — <span class="note">Blair Atholl</span></span></li>
+            <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">House of Bruar</span> — <span class="note">pause shopping/déj, optionnel</span></span></li>
+          </ul>
+        </div>
+        <div class="block place-b">
+          <p class="block-h"><span class="tag"></span> Sur place</p>
+          <ul class="items">
+            <li class="note-only" data-prio="1"><span class="stars">★</span><span class="it-body">Ce qui n'a pas pu être fait à l'étape 1 (Holyrood, Dean Village, Calton Hill…)</span></li>
+          </ul>
+        </div>
+        </div>
+      </article>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="rule"></div>
+  Itinéraire indicatif · horaires des ferries, trains et attractions à reconfirmer avant le départ.
+  Dernière mise à jour : juin 2026.
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // ---- Map ----
+  const stops = [
+    {n:1,  name:"Édimbourg",   d:"27 → 29 juin · 2 nuits",   lat:55.9533, lng:-3.1883},
+    {n:2,  name:"Fort William",d:"29 → 30 juin · 1 nuit",    lat:56.8198, lng:-5.1052},
+    {n:3,  name:"Mallaig",     d:"30 juin → 1 juil. · 1 nuit",lat:57.0058, lng:-5.8285},
+    {n:4,  name:"Île de Skye", d:"1 → 5 juil. · 4 nuits",     lat:57.4419, lng:-6.5897},
+    {n:5,  name:"Ullapool",    d:"5 → 6 juil. · 1 nuit",      lat:57.8956, lng:-5.1618},
+    {n:6,  name:"Durness",     d:"6 → 8 juil. · 2 nuits",     lat:58.5683, lng:-4.7497},
+    {n:7,  name:"Dunnet",      d:"8 → 10 juil. · 2 nuits",    lat:58.6173, lng:-3.3573},
+    {n:8,  name:"Inverness",   d:"10 → 12 juil. · 2 nuits",   lat:57.4778, lng:-4.2247},
+    {n:9,  name:"Aviemore",    d:"12 → 13 juil. · 1 nuit",    lat:57.1958, lng:-3.8253},
+    {n:10, name:"Édimbourg",   d:"13 → 14 juil. · 1 nuit",    lat:55.9533, lng:-3.1883}
+  ];
+
+  if (window.L) {
+    const map = L.map('map', { scrollWheelZoom:false });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution:'&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      maxZoom:19
+    }).addTo(map);
+
+    // ---- route segments: real driving routes + ferry crossing ----
+    const driveStyle = { color:'#1F5C58', weight:4, opacity:.85, lineCap:'round', lineJoin:'round' };
+    const ferryStyle = { color:'#2E86AB', weight:3, opacity:.95, dashArray:'3 9', lineCap:'round' };
+    const ARMADALE = { lat:57.0648, lng:-5.8939 }; // débarquement ferry sur Skye
+
+    // build ordered segments; Mallaig → Skye = ferry then road
+    const segs = [];
+    for (let i = 0; i < stops.length - 1; i++){
+      const a = stops[i], b = stops[i+1];
+      if (a.name === "Mallaig"){
+        segs.push({ a:{lat:a.lat,lng:a.lng}, b:ARMADALE, mode:"ferry" });
+        segs.push({ a:ARMADALE, b:{lat:b.lat,lng:b.lng}, mode:"drive" });
+      } else {
+        segs.push({ a:{lat:a.lat,lng:a.lng}, b:{lat:b.lat,lng:b.lng}, mode:"drive" });
+      }
+    }
+
+    function drawStraight(a, b, style){
+      L.polyline([[a.lat,a.lng],[b.lat,b.lng]], style).addTo(map);
+    }
+
+    segs.forEach(seg => {
+      if (seg.mode === "ferry"){ drawStraight(seg.a, seg.b, ferryStyle); return; }
+      const url = `https://router.project-osrm.org/route/v1/driving/`
+        + `${seg.a.lng},${seg.a.lat};${seg.b.lng},${seg.b.lat}`
+        + `?overview=full&geometries=geojson`;
+      fetch(url)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.routes && data.routes[0]){
+            const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+            L.polyline(coords, driveStyle).addTo(map);
+          } else {
+            drawStraight(seg.a, seg.b, driveStyle); // repli : ligne droite
+          }
+        })
+        .catch(() => drawStraight(seg.a, seg.b, driveStyle));
+    });
+
+    // numbered pins
+    stops.forEach((s, i) => {
+      const last = (i === stops.length - 1);
+      const icon = L.divIcon({
+        className:'',
+        html:`<div class="map-pin${last ? ' last' : ''}"><span>${s.n}</span></div>`,
+        iconSize:[30,30], iconAnchor:[15,30], popupAnchor:[0,-30]
+      });
+      L.marker([s.lat, s.lng], { icon })
+        .addTo(map)
+        .bindPopup(`<b>${s.n}. ${s.name}</b><br><span class="pd">${s.d}</span>`);
+    });
+
+    // legend
+    const legend = L.control({ position:"bottomleft" });
+    legend.onAdd = function(){
+      const d = L.DomUtil.create("div", "map-legend");
+      d.innerHTML = '<i class="r"></i> Route&nbsp;&nbsp;&nbsp;<i class="f"></i> Ferry';
+      return d;
+    };
+    legend.addTo(map);
+
+    const allPts = stops.map(s => [s.lat, s.lng]);
+    allPts.push([ARMADALE.lat, ARMADALE.lng]);
+    map.fitBounds(L.latLngBounds(allPts), { padding:[40,40] });
+    // ensure correct sizing once layout/fonts settle
+    setTimeout(() => map.invalidateSize(), 250);
+    window.addEventListener('load', () => map.invalidateSize());
+  } else {
+    document.getElementById('map').innerHTML =
+      '<div style="padding:24px;font-size:.9rem;color:var(--muted);text-align:center">' +
+      'La carte n\'a pas pu se charger. Ouvrez la page dans un navigateur (pas l\'aperçu) ' +
+      'et vérifiez votre connexion internet.</div>';
+  }
+
+  // ---- Priority filter ----
+  const body = document.body;
+  const buttons = document.querySelectorAll('.filters button');
+  function applyFilter(f){
+    body.classList.remove('f-all','f23','f3');
+    body.classList.add(f === 'all' ? 'f-all' : f);
+    buttons.forEach(b => b.setAttribute('aria-pressed', b.dataset.f === f));
+    // hide blocks that have no visible items
+    document.querySelectorAll('.block').forEach(block => {
+      const visible = [...block.querySelectorAll('ul.items > li')]
+        .some(li => getComputedStyle(li).display !== 'none');
+      block.classList.toggle('is-empty', !visible);
+    });
+  }
+  buttons.forEach(b => b.addEventListener('click', () => applyFilter(b.dataset.f)));
+
+  // Scroll reveal
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+    }, { rootMargin: '0px 0px -10% 0px' });
+    document.querySelectorAll('.stop').forEach(s => io.observe(s));
+  } else {
+    document.querySelectorAll('.stop').forEach(s => s.classList.add('in'));
+  }
+</script>
+</body>
+</html>
