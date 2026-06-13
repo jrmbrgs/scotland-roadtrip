@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Photos · Roadtrip Écosse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15282A;--teal:#1F5C58;--teal-soft:#3a7d77;
+    --gold:#bd8526;--mist:#e8ebe3;--mist-2:#dfe4da;
+    --paper:#fcfcf8;--line:#cdd4cb;--muted:#586460;--r:16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--mist);color:var(--ink);
+    font-family:"Inter",system-ui,sans-serif;font-size:16px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    min-height:100dvh;display:flex;flex-direction:column;
+  }
+  .header{
+    padding:32px 24px 24px;text-align:center;
+  }
+  .header h1{
+    font-family:"Fraunces",serif;font-weight:500;
+    font-size:1.8rem;margin:0 0 4px;letter-spacing:-.01em;
+  }
+  .header p{margin:0;font-size:.85rem;color:var(--muted)}
+  .header a{color:var(--teal);font-size:.85rem}
+  .container{
+    max-width:500px;width:100%;margin:0 auto;padding:0 20px 40px;flex:1;
+  }
+  label{
+    display:block;font-family:"Spline Sans Mono",monospace;
+    font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 8px;
+  }
+  select{
+    width:100%;padding:12px 14px;border:1px solid var(--line);
+    border-radius:10px;background:var(--paper);color:var(--ink);
+    font:inherit;font-size:.95rem;appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23586460' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;
+    cursor:pointer;
+  }
+  select:focus{outline:2px solid var(--teal);outline-offset:1px}
+  .dropzone{
+    margin-top:20px;border:2px dashed var(--line);border-radius:var(--r);
+    padding:40px 20px;text-align:center;cursor:pointer;
+    background:var(--paper);transition:.2s;
+  }
+  .dropzone.over{border-color:var(--teal);background:rgba(31,92,88,.06)}
+  .dropzone .icon{font-size:2rem;margin-bottom:8px}
+  .dropzone .txt{font-size:.9rem;color:var(--muted)}
+  .dropzone .txt b{color:var(--teal)}
+  .dropzone input{display:none}
+  .queue{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+  .item{
+    display:flex;align-items:center;gap:12px;
+    background:var(--paper);border:1px solid var(--line);
+    border-radius:10px;padding:10px 14px;
+  }
+  .item img{
+    width:48px;height:48px;object-fit:cover;border-radius:6px;flex:none;
+  }
+  .item .info{flex:1;min-width:0}
+  .item .title-input{
+    width:100%;padding:4px 8px;border:1px solid var(--line);border-radius:6px;
+    font:inherit;font-size:.85rem;color:var(--ink);background:var(--mist);
+  }
+  .item .title-input:focus{outline:1px solid var(--teal);border-color:var(--teal)}
+  .item .status{font-size:.75rem;color:var(--muted)}
+  .item .status.ok{color:var(--teal)}
+  .item .status.err{color:#c0392b}
+  .item .bar{
+    height:3px;background:var(--mist-2);border-radius:2px;margin-top:4px;overflow:hidden;
+  }
+  .item .bar .fill{height:100%;background:var(--teal);border-radius:2px;width:0%;transition:width .3s}
+  .btn{
+    display:block;width:100%;margin-top:24px;padding:14px;
+    font:inherit;font-size:.95rem;font-weight:600;
+    background:var(--teal);color:#fff;border:none;border-radius:10px;
+    cursor:pointer;transition:.2s;
+  }
+  .btn:hover{background:var(--teal-soft)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .summary{
+    margin-top:16px;text-align:center;
+    font-size:.85rem;color:var(--teal);font-weight:500;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Upload Photos</h1>
+  <p>Ajoute tes photos au roadtrip</p>
+  <a href="index.html">&larr; Voir l'itinéraire</a>
+</div>
+
+<div class="container">
+  <label for="tag">Étape</label>
+  <select id="tag">
+    <option value="depart">00 — Départ de Nice</option>
+    <option value="edinburgh">01 — Édimbourg</option>
+    <option value="fort-william">02 — Fort William</option>
+    <option value="mallaig">03 — Mallaig</option>
+    <option value="skye">04 — Île de Skye</option>
+    <option value="ullapool">05 — Ullapool</option>
+    <option value="durness">06 — Durness</option>
+    <option value="dunnet">07 — Dunnet</option>
+    <option value="inverness">08 — Inverness</option>
+    <option value="aviemore">09 — Aviemore</option>
+    <option value="edinburgh-retour">10 — Édimbourg (retour)</option>
+    <option value="retour">11 — Retour à Nice</option>
+  </select>
+
+  <div class="dropzone" id="dropzone">
+    <div class="icon">+</div>
+    <div class="txt">Touche pour <b>choisir des photos</b><br>ou glisse-les ici</div>
+    <input type="file" id="files" accept="image/*" multiple>
+  </div>
+
+  <div class="queue" id="queue"></div>
+  <button class="btn" id="upload-btn" disabled>Envoyer</button>
+  <div class="summary" id="summary"></div>
+</div>
+
+<script>
+const CLOUD = 'brgsjrm';
+const PRESET = 'scotland';
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('files');
+const queue = document.getElementById('queue');
+const btn = document.getElementById('upload-btn');
+const summary = document.getElementById('summary');
+let pending = [];
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('over'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('over'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('over');
+  addFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', () => addFiles(fileInput.files));
+
+function addFiles(files) {
+  [...files].forEach(f => {
+    if (!f.type.startsWith('image/')) return;
+    const id = Date.now() + Math.random();
+    const nameNoExt = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+    pending.push({ file: f, id, nameNoExt });
+    const thumb = URL.createObjectURL(f);
+    queue.insertAdjacentHTML('beforeend', `
+      <div class="item" data-id="${id}">
+        <img src="${thumb}" alt="">
+        <div class="info">
+          <input class="title-input" value="${nameNoExt}" placeholder="Titre de la photo">
+          <div class="status">En attente</div>
+          <div class="bar"><div class="fill"></div></div>
+        </div>
+      </div>
+    `);
+  });
+  btn.disabled = pending.length === 0;
+  summary.textContent = '';
+}
+
+btn.addEventListener('click', async () => {
+  if (!pending.length) return;
+  btn.disabled = true;
+  const tag = document.getElementById('tag').value;
+  let ok = 0, fail = 0;
+
+  for (const item of pending) {
+    const el = queue.querySelector(`[data-id="${item.id}"]`);
+    const status = el.querySelector('.status');
+    const fill = el.querySelector('.fill');
+    status.textContent = 'Envoi...';
+    status.className = 'status';
+
+    const titleInput = el.querySelector('.title-input');
+    const title = titleInput.value.trim() || item.nameNoExt;
+    titleInput.readOnly = true;
+    const publicId = tag + '/' + title.replace(/ /g, '-').replace(/[',]/g, '');
+
+    const fd = new FormData();
+    fd.append('file', item.file);
+    fd.append('upload_preset', PRESET);
+    fd.append('tags', tag);
+    fd.append('public_id', publicId);
+
+    try {
+      const resp = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`);
+        xhr.upload.onprogress = e => {
+          if (e.lengthComputable) fill.style.width = Math.round(e.loaded / e.total * 100) + '%';
+        };
+        xhr.onload = () => xhr.status === 200 ? resolve(JSON.parse(xhr.responseText)) : reject(xhr.responseText);
+        xhr.onerror = () => reject('Erreur réseau');
+        xhr.send(fd);
+      });
+      status.textContent = 'Envoyé';
+      status.className = 'status ok';
+      fill.style.width = '100%';
+      ok++;
+    } catch (e) {
+      status.textContent = 'Erreur';
+      status.className = 'status err';
+      fill.style.width = '0%';
+      fail++;
+    }
+  }
+
+  pending = [];
+  summary.textContent = `${ok} photo(s) envoyée(s)` + (fail ? `, ${fail} erreur(s)` : '');
+});
+</script>
+</body>
+</html>
