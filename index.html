@@ -238,6 +238,30 @@
 
   .warn{color:var(--gold)}
 
+  /* ---------- PHOTO GALLERY ---------- */
+  .gallery{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+    gap:8px;margin-top:16px;
+  }
+  .gallery img{
+    width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;
+    cursor:pointer;transition:transform .2s;
+    background:var(--mist-2);
+  }
+  .gallery img:hover{transform:scale(1.03)}
+  .gallery.loading::before{
+    content:"Chargement des photos…";
+    grid-column:1/-1;text-align:center;
+    font-size:.85rem;color:var(--muted);padding:12px 0;
+  }
+  .lightbox{
+    position:fixed;inset:0;z-index:100;
+    background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;
+    cursor:zoom-out;opacity:0;pointer-events:none;transition:opacity .25s;
+  }
+  .lightbox.open{opacity:1;pointer-events:auto}
+  .lightbox img{max-width:92vw;max-height:90vh;border-radius:8px;box-shadow:0 4px 40px rgba(0,0,0,.5)}
+
   /* sub-notes inside an item (Glenfinnan) */
   .subnotes{margin:6px 0 0;padding-left:0;list-style:none;
     font-size:.82rem;color:var(--muted);border-left:2px solid var(--mist-2);padding-left:12px}
@@ -325,6 +349,20 @@
 <main>
   <div class="route">
 
+    <!-- 0 — Départ -->
+    <section class="stop">
+      <div class="node">00</div>
+      <article class="card">
+        <div class="card-photo" style="background-image:url('https://images.unsplash.com/photo-1534237710431-e2fc698436d0?auto=format&fit=crop&w=1000&q=70')"></div>
+        <div class="card-body">
+        <h2>Départ de Nice</h2>
+        <div class="meta"><span class="chip">27 juin</span><span class="chip nights">✈️ vol</span></div>
+        <p class="trajet">✈️ <b>Vol</b> — Nice → Édimbourg</p>
+        <div class="gallery loading" data-tag="depart"></div>
+        </div>
+      </article>
+    </section>
+
     <!-- 1 -->
     <section class="stop">
       <div class="node">01</div>
@@ -346,6 +384,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Royal Botanic Garden</span> — <span class="note">calme, gratuit</span></span></li>
           </ul>
         </div>
+        <div class="gallery loading" data-tag="edinburgh"></div>
         </div>
       </article>
     </section>
@@ -375,6 +414,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Ben Nevis (au pied)</span> — <span class="note">+ front de loch / Old Fort</span></span></li>
           </ul>
         </div>
+        <div class="gallery loading" data-tag="fort-william"></div>
         </div>
       </article>
     </section>
@@ -404,6 +444,7 @@
             <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Morar</span> — <span class="note">plages de sable blanc avant Mallaig</span></span></li>
           </ul>
         </div>
+        <div class="gallery loading" data-tag="mallaig"></div>
         </div>
       </article>
     </section>
@@ -442,6 +483,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Dunvegan Castle &amp; jardins</span> — <span class="note">optionnel</span></span></li>
           </ul>
         </div>
+        <div class="gallery loading" data-tag="skye"></div>
         </div>
       </article>
     </section>
@@ -471,6 +513,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Ullapool Museum</span> — <span class="note">histoire locale, ancienne église</span></span></li>
           </ul>
         </div>
+        <div class="gallery loading" data-tag="ullapool"></div>
         </div>
       </article>
     </section>
@@ -500,6 +543,7 @@
             <li data-prio="2"><span class="stars">★★<span class="off">★</span></span><span class="it-body"><span class="name">Balnakeil Beach</span></span></li>
           </ul>
         </div>
+        <div class="gallery loading" data-tag="durness"></div>
         </div>
       </article>
     </section>
@@ -530,6 +574,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Phoques &amp; oiseaux marins</span></span></li>
           </ul>
         </div>
+        <div class="gallery loading" data-tag="dunnet"></div>
         </div>
       </article>
     </section>
@@ -566,6 +611,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Parcs, rivière</span></span></li>
           </ul>
         </div>
+        <div class="gallery loading" data-tag="inverness"></div>
         </div>
       </article>
     </section>
@@ -595,6 +641,7 @@
             <li data-prio="1"><span class="stars">★<span class="off">★★</span></span><span class="it-body"><span class="name">Landmark Forest Adventure Park</span> — <span class="note">activités famille</span></span></li>
           </ul>
         </div>
+        <div class="gallery loading" data-tag="aviemore"></div>
         </div>
       </article>
     </section>
@@ -624,6 +671,7 @@
             <li class="note-only" data-prio="1"><span class="stars">★</span><span class="it-body">Ce qui n'a pas pu être fait à l'étape 1 (Holyrood, Dean Village, Calton Hill…)</span></li>
           </ul>
         </div>
+        <div class="gallery loading" data-tag="edinburgh-retour"></div>
         </div>
       </article>
     </section>
@@ -636,6 +684,8 @@
   Itinéraire indicatif · horaires des ferries, trains et attractions à reconfirmer avant le départ.
   Dernière mise à jour : juin 2026.
 </footer>
+
+<div class="lightbox" id="lightbox"><img src="" alt=""></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -759,6 +809,35 @@
   } else {
     document.querySelectorAll('.stop').forEach(s => s.classList.add('in'));
   }
+
+  // ---- Cloudinary photo galleries ----
+  const CLOUD = 'brgsjrm';
+  const lb = document.getElementById('lightbox');
+  const lbImg = lb.querySelector('img');
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+
+  document.querySelectorAll('.gallery[data-tag]').forEach(gallery => {
+    const tag = gallery.dataset.tag;
+    fetch(`https://res.cloudinary.com/${CLOUD}/image/list/${tag}.json`)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => {
+        gallery.classList.remove('loading');
+        (data.resources || []).forEach(img => {
+          const el = document.createElement('img');
+          el.src = `https://res.cloudinary.com/${CLOUD}/image/upload/c_fill,w_400,h_300,q_auto,f_auto/${img.public_id}.${img.format}`;
+          el.alt = img.public_id;
+          el.loading = 'lazy';
+          el.addEventListener('click', () => {
+            lbImg.src = `https://res.cloudinary.com/${CLOUD}/image/upload/c_limit,w_1600,q_auto,f_auto/${img.public_id}.${img.format}`;
+            lb.classList.add('open');
+          });
+          gallery.appendChild(el);
+        });
+        if (!data.resources || !data.resources.length) gallery.remove();
+      })
+      .catch(() => gallery.remove());
+  });
 </script>
 </body>
 </html>
