@@ -212,11 +212,11 @@
   }
   .weather-badge img{width:24px;height:24px}
   .new-badge{
-    display:inline-block;width:8px;height:8px;border-radius:50%;
-    background:var(--gold);margin-left:6px;vertical-align:middle;
-    animation:pulse-gold 2s infinite;
+    display:inline-block;font-size:.6rem;font-weight:600;letter-spacing:.04em;
+    padding:2px 7px;border-radius:8px;margin-left:8px;vertical-align:middle;
+    background:var(--gold);color:#fff;
+    font-family:"Spline Sans Mono",monospace;text-transform:uppercase;
   }
-  @keyframes pulse-gold{0%,100%{box-shadow:0 0 0 0 rgba(189,133,38,.4)}50%{box-shadow:0 0 0 5px rgba(189,133,38,0)}}
   .meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 2px}
   .chip{
     font-family:"Spline Sans Mono",monospace;font-size:.74rem;letter-spacing:.02em;
@@ -1378,11 +1378,11 @@
             if (!card) return;
             const journalTitle = card.querySelector('.posts-title');
             if (journalTitle && !journalTitle.querySelector('.new-badge')) {
-              journalTitle.insertAdjacentHTML('beforeend', '<span class="new-badge" title="Nouveau"></span>');
+              journalTitle.insertAdjacentHTML('beforeend', '<span class="new-badge">nouveau</span>');
             }
             const galleryTitle = card.querySelector('.gallery-title');
             if (galleryTitle && !galleryTitle.querySelector('.new-badge')) {
-              galleryTitle.insertAdjacentHTML('beforeend', '<span class="new-badge" title="Nouveau"></span>');
+              galleryTitle.insertAdjacentHTML('beforeend', '<span class="new-badge">nouveau</span>');
             }
           }
         });
