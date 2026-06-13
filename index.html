@@ -842,23 +842,32 @@
       maxZoom:19
     }).addTo(map);
 
-    // ---- route segments: real driving routes + ferry crossing ----
+    // ---- route segments via hotel coordinates ----
     const driveStyle = { color:'#1F5C58', weight:4, opacity:.85, lineCap:'round', lineJoin:'round' };
     const ferryStyle = { color:'#2E86AB', weight:3, opacity:.95, dashArray:'3 9', lineCap:'round' };
     const flightStyle = { color:'#8B6BAE', weight:2, opacity:.6, dashArray:'6 8', lineCap:'round' };
     const ARMADALE = { lat:57.0648, lng:-5.8939 };
 
+    const waypoints = [
+      {lat:43.6655,lng:7.2150,mode:"flight"},
+      {lat:55.9575,lng:-3.1850,mode:"drive"},
+      {lat:56.8198,lng:-5.1052,mode:"drive"},
+      {lat:56.9685,lng:-5.8440,mode:"ferry"},
+      {lat:57.0648,lng:-5.8939,mode:"drive"},
+      {lat:57.4490,lng:-6.5890,mode:"drive"},
+      {lat:57.5850,lng:-6.3720,mode:"drive"},
+      {lat:57.8960,lng:-5.1590,mode:"drive"},
+      {lat:58.5650,lng:-4.7420,mode:"drive"},
+      {lat:58.4560,lng:-3.0970,mode:"drive"},
+      {lat:57.4720,lng:-4.2190,mode:"drive"},
+      {lat:57.1780,lng:-3.8600,mode:"drive"},
+      {lat:55.9470,lng:-3.2220,mode:"flight"},
+      {lat:43.6655,lng:7.2150},
+    ];
+
     const segs = [];
-    for (let i = 0; i < stops.length - 1; i++){
-      const a = stops[i], b = stops[i+1];
-      if (a.name === "Nice"){
-        segs.push({ a:{lat:a.lat,lng:a.lng}, b:{lat:b.lat,lng:b.lng}, mode:"flight" });
-      } else if (a.name === "Mallaig"){
-        segs.push({ a:{lat:a.lat,lng:a.lng}, b:ARMADALE, mode:"ferry" });
-        segs.push({ a:ARMADALE, b:{lat:b.lat,lng:b.lng}, mode:"drive" });
-      } else {
-        segs.push({ a:{lat:a.lat,lng:a.lng}, b:{lat:b.lat,lng:b.lng}, mode:"drive" });
-      }
+    for (let i = 0; i < waypoints.length - 1; i++){
+      segs.push({ a:waypoints[i], b:waypoints[i+1], mode:waypoints[i].mode });
     }
 
     function drawStraight(a, b, style){
