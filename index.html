@@ -357,9 +357,13 @@
   @media (max-width:560px){
     .hero{padding:56px 18px 32px}
     main{padding:34px 16px 70px}
-    .stop{padding-left:54px}
-    .node{width:42px;height:42px;font-size:.82rem}
-    .route::before{left:20px}
+    .route::before{display:none}
+    .stop{padding-left:0;margin-bottom:28px}
+    .node{
+      position:relative;left:auto;top:auto;
+      width:32px;height:32px;font-size:.72rem;
+      margin-bottom:10px;
+    }
     .card-body{padding:18px}
     .card-photo{height:130px}
     #map{height:320px}
