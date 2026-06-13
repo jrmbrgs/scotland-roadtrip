@@ -1365,22 +1365,31 @@
   // ---- New post badge ----
   (function(){
     const seen = JSON.parse(localStorage.getItem('scotland-seen-posts') || '{}');
-    fetch(`${FB}/posts.json`).then(r => r.json()).then(allPosts => {
-      if (!allPosts) return;
-      const newSeen = {};
-      Object.entries(allPosts).forEach(([tag, posts]) => {
-        const keys = Object.keys(posts);
-        newSeen[tag] = keys.length;
-        const prev = seen[tag] || 0;
-        if (keys.length > prev) {
-          const title = document.querySelector(`.gallery-section[data-tag="${tag}"]`)?.closest('.card-body')?.querySelector('.gallery-title');
-          if (title && !title.querySelector('.new-badge')) {
-            title.insertAdjacentHTML('beforeend', '<span class="new-badge" title="Nouveau"></span>');
+    const addBadge = () => {
+      fetch(`${FB}/posts.json`).then(r => r.json()).then(allPosts => {
+        if (!allPosts) return;
+        const newSeen = {};
+        Object.entries(allPosts).forEach(([tag, posts]) => {
+          const keys = Object.keys(posts);
+          newSeen[tag] = keys.length;
+          const prev = seen[tag] || 0;
+          if (keys.length > prev) {
+            const card = document.querySelector(`.gallery-section[data-tag="${tag}"]`)?.closest('.card-body');
+            if (!card) return;
+            const journalTitle = card.querySelector('.posts-title');
+            if (journalTitle && !journalTitle.querySelector('.new-badge')) {
+              journalTitle.insertAdjacentHTML('beforeend', '<span class="new-badge" title="Nouveau"></span>');
+            }
+            const galleryTitle = card.querySelector('.gallery-title');
+            if (galleryTitle && !galleryTitle.querySelector('.new-badge')) {
+              galleryTitle.insertAdjacentHTML('beforeend', '<span class="new-badge" title="Nouveau"></span>');
+            }
           }
-        }
+        });
+        localStorage.setItem('scotland-seen-posts', JSON.stringify(newSeen));
       });
-      localStorage.setItem('scotland-seen-posts', JSON.stringify(newSeen));
-    });
+    };
+    setTimeout(addBadge, 1500);
   })();
 </script>
 </body>
