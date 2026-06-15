@@ -320,7 +320,7 @@
   }
   .post-bubble .post-photos.single img{aspect-ratio:1}
   .post-bubble .post-photos img:hover{transform:scale(1.04)}
-  .post-bubble .post-date{font-size:.7rem;color:var(--muted);margin-top:6px}
+  .post-bubble .post-date{font-size:.7rem;color:var(--muted);margin-bottom:6px}
   .post-bubble .post-author{font-weight:500;color:var(--teal);font-size:.78rem}
   .post-replies{margin:6px 0 0;padding-left:14px;border-left:2px solid var(--mist-2)}
   .post-reply{margin:6px 0;font-size:.82rem}
@@ -1256,9 +1256,9 @@
               const photos = renderPostPhotos(p.photos);
               const replies = renderReplies(p.replies);
               return `<div class="post-bubble" data-tag="${tag}" data-key="${key}">
+                <div class="post-date">${p.author ? '<span class="post-author">' + esc(p.author) + '</span> · ' : ''}${date}</div>
                 ${text ? '<p>' + text + '</p>' : ''}
                 ${photos}
-                <div class="post-date">${p.author ? '<span class="post-author">' + esc(p.author) + '</span> · ' : ''}${date}</div>
                 ${replies}
                 <button class="reply-toggle">Répondre</button>
                 <div class="reply-form" style="display:none">
