@@ -309,6 +309,17 @@
     background:var(--mist);border-radius:10px;padding:12px 14px;margin-bottom:8px;
   }
   .post-bubble p{margin:0;font-size:.88rem;white-space:pre-wrap;line-height:1.5}
+  .post-bubble .post-photos{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0 4px;
+  }
+  .post-bubble .post-photos.single{grid-template-columns:1fr;max-width:320px}
+  .post-bubble .post-photos.duo{grid-template-columns:1fr 1fr}
+  .post-bubble .post-photos img{
+    width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;cursor:pointer;
+    border:1px solid var(--line);transition:transform .2s;
+  }
+  .post-bubble .post-photos.single img{aspect-ratio:4/3}
+  .post-bubble .post-photos img:hover{transform:scale(1.04)}
   .post-bubble .post-date{font-size:.7rem;color:var(--muted);margin-top:6px}
   .post-bubble .post-author{font-weight:500;color:var(--teal);font-size:.78rem}
   .post-replies{margin:6px 0 0;padding-left:14px;border-left:2px solid var(--mist-2)}
@@ -515,7 +526,7 @@
         <p class="card-teaser">L'aventure commence sur le tarmac</p>
         <div class="meta"><span class="chip">27 juin</span><span class="chip nights">✈️ vol</span></div>
         <p class="trajet">✈️ <b>Vol</b> — Nice → Édimbourg</p>
-        <div class="gallery-section loading" data-tag="depart"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="depart"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -530,7 +541,7 @@
         <p class="card-teaser">Ruelles médiévales, château et Arthur's Seat</p>
         <div class="meta"><span class="chip">27 → 29 juin</span><span class="chip nights">2 nuits</span></div>
         <p class="hotel"><span class="pin">🏨</span> Caravel / Atlas Guest House<small>30 London St, Edinburgh EH3 6NA</small></p>
-        <div class="gallery-section loading" data-tag="edinburgh"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="edinburgh"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         <div class="programme-section">
         <p class="programme-title">Programme</p>
         <div class="block place-b">
@@ -561,7 +572,7 @@
         <div class="meta"><span class="chip">29 → 30 juin</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Family Friendly Apartment<small>Fort William — adresse exacte sur la confirmation Booking</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Édimbourg → Fort William · ~4h</p>
-        <div class="gallery-section loading" data-tag="fort-william"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="fort-william"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         <div class="programme-section">
         <p class="programme-title">Programme</p>
         <div class="block route-b">
@@ -595,7 +606,7 @@
         <div class="meta"><span class="chip">30 juin → 1 juil.</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Fair Winds B&amp;B <small>Morar PH40 4PD · chez Janet · ⚠️ départ tôt, ferry à 8h45</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Fort William → Mallaig (Road to the Isles) · ~2h</p>
-        <div class="gallery-section loading" data-tag="mallaig"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="mallaig"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         <div class="programme-section">
         <p class="programme-title">Programme</p>
         <div class="block route-b">
@@ -639,7 +650,7 @@
             <li><strong>12h</strong> croisière AquaXplore Elgol <em>(réservé)</em> — au port vers 11h40</li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="skye"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="skye"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         <div class="programme-section">
         <p class="programme-title">Programme</p>
         <div class="block place-b">
@@ -673,7 +684,7 @@
         <div class="meta"><span class="chip">5 → 6 juillet</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> The Arch Inn<small>10-11 West Shore St, Ullapool IV26 2UR</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Skye → Ullapool · ~3h30-4h</p>
-        <div class="gallery-section loading" data-tag="ullapool"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="ullapool"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         <div class="programme-section">
         <p class="programme-title">Programme</p>
         <div class="block route-b">
@@ -707,7 +718,7 @@
         <div class="meta"><span class="chip">6 → 8 juillet</span><span class="chip nights">2 nuits</span></div>
         <p class="hotel"><span class="pin">🏨</span> Wild Orchid Guest House<small>Durine, Durness IV27 4PN</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Ullapool → Durness · ~3h30-4h · 👉 route superbe mais lente, prévoir des pauses</p>
-        <div class="gallery-section loading" data-tag="durness"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="durness"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         <div class="programme-section">
         <p class="programme-title">Programme</p>
         <div class="block route-b">
@@ -741,7 +752,7 @@
         <div class="meta"><span class="chip">8 → 10 juillet</span><span class="chip nights">2 nuits</span></div>
         <p class="hotel"><span class="pin">🏨</span> Sinclair Bay Lodges<small>Keiss, Wick KW1 4AT · ⚠️ côté Keiss/Wick, ~30 min à l'est de Dunnet Head — à vérifier</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Durness → Dunnet · ~2h30</p>
-        <div class="gallery-section loading" data-tag="dunnet"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="dunnet"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         <div class="programme-section">
         <p class="programme-title">Programme</p>
         <div class="block route-b">
@@ -783,7 +794,7 @@
             <li><span class="warn">⚠️</span> Parking petit et vite plein → arriver tôt, courte marche jusqu'à la pointe</li>
           </ul>
         </div>
-        <div class="gallery-section loading" data-tag="inverness"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="inverness"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         <div class="programme-section">
         <p class="programme-title">Programme</p>
         <div class="block route-b">
@@ -817,7 +828,7 @@
         <div class="meta"><span class="chip">12 → 13 juillet</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Coylumbridge Resort Hotel<small>Coylumbridge, Aviemore PH22 1QN</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Inverness → Aviemore · ~1h<br>🌅 Le 12/7 : départ ~9h30 → Cairngorm Reindeer Centre, Glenmore (~1h) pour le RDV de 11h, puis check-in.</p>
-        <div class="gallery-section loading" data-tag="aviemore"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="aviemore"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         <div class="programme-section">
         <p class="programme-title">Programme</p>
         <div class="block route-b">
@@ -851,7 +862,7 @@
         <div class="meta"><span class="chip">13 → 14 juillet</span><span class="chip nights">1 nuit</span></div>
         <p class="hotel"><span class="pin">🏨</span> Haymarket Hotel<small>11 Coates Gardens, Edinburgh EH12 5LG</small></p>
         <p class="trajet">🚗 <b>Trajet</b> — Aviemore → Édimbourg · ~3h, axe A9</p>
-        <div class="gallery-section loading" data-tag="edinburgh-retour"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="edinburgh-retour"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         <div class="programme-section">
         <p class="programme-title">Programme</p>
         <div class="block route-b">
@@ -883,7 +894,7 @@
         <p class="card-teaser">La tête pleine de brume et de souvenirs</p>
         <div class="meta"><span class="chip">14 juillet</span><span class="chip nights">✈️ vol</span></div>
         <p class="trajet">✈️ <b>Vol</b> — Édimbourg → Nice</p>
-        <div class="gallery-section loading" data-tag="retour"><p class="gallery-title">Nos photos</p><div class="gallery"></div></div>
+        <div class="gallery-section loading" data-tag="retour"><p class="gallery-title">Toutes les photos</p><div class="gallery"></div></div>
         </div>
       </article>
     </section>
@@ -1167,6 +1178,46 @@
     document.querySelectorAll('.stop').forEach(s => s.classList.add('in'));
   }
 
+  // ---- Lightbox ----
+  const CLOUD = 'brgsjrm';
+  const VISIBLE_COUNT = 6;
+  const lb = document.getElementById('lightbox');
+  const lbImg = lb.querySelector('img');
+  const lbCaption = lb.querySelector('.lb-caption');
+  const lbCounter = lb.querySelector('.lb-counter');
+  let lbPhotos = [], lbIndex = 0;
+
+  function showLb(index) {
+    lbIndex = index;
+    const p = lbPhotos[index];
+    lbImg.src = p.full;
+    lbCaption.textContent = p.title || '';
+    lbCounter.textContent = `${index + 1} / ${lbPhotos.length}`;
+    lb.classList.add('open');
+  }
+
+  lb.addEventListener('click', e => {
+    if (!e.target.closest('.lb-nav') && e.target.tagName !== 'IMG') lb.classList.remove('open');
+  });
+  lb.querySelector('.lb-prev').addEventListener('click', e => { e.stopPropagation(); showLb((lbIndex - 1 + lbPhotos.length) % lbPhotos.length); });
+  lb.querySelector('.lb-next').addEventListener('click', e => { e.stopPropagation(); showLb((lbIndex + 1) % lbPhotos.length); });
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') lb.classList.remove('open');
+    if (e.key === 'ArrowLeft') showLb((lbIndex - 1 + lbPhotos.length) % lbPhotos.length);
+    if (e.key === 'ArrowRight') showLb((lbIndex + 1) % lbPhotos.length);
+  });
+
+  let touchStartX = 0;
+  lb.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; }, {passive:true});
+  lb.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) {
+      if (dx > 0) showLb((lbIndex - 1 + lbPhotos.length) % lbPhotos.length);
+      else showLb((lbIndex + 1) % lbPhotos.length);
+    }
+  });
+
   // ---- Firebase posts ----
   const TAGS = ['depart','edinburgh','fort-william','mallaig','skye','ullapool','durness','dunnet','inverness','aviemore','edinburgh-retour','retour'];
   function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -1177,6 +1228,14 @@
     return '<div class="post-replies">'+Object.values(replies).sort((a,b)=>a.ts-b.ts).map(r=>
       `<div class="post-reply"><span class="reply-author">${esc(r.name)}</span><span class="reply-date">${fmtDate(r.ts)}</span><br>${esc(r.text)}</div>`
     ).join('')+'</div>';
+  }
+
+  function renderPostPhotos(photos) {
+    if (!photos || !photos.length) return '';
+    const cls = photos.length === 1 ? 'single' : photos.length === 2 ? 'duo' : '';
+    return `<div class="post-photos ${cls}">` + photos.map(p =>
+      `<img src="${p.thumb}" data-full="${p.full}" alt="${esc(p.title || '')}" loading="lazy">`
+    ).join('') + '</div>';
   }
 
   fetch(`${FB}/posts.json`)
@@ -1192,11 +1251,13 @@
           const sorted = Object.entries(posts).sort((a, b) => a[1].ts - b[1].ts);
           div.innerHTML = '<p class="posts-title">Journal</p>' +
             sorted.map(([key, p]) => {
-              const text = esc(p.text);
+              const text = p.text ? esc(p.text) : '';
               const date = fmtDate(p.ts);
+              const photos = renderPostPhotos(p.photos);
               const replies = renderReplies(p.replies);
               return `<div class="post-bubble" data-tag="${tag}" data-key="${key}">
-                <p>${text}</p>
+                ${text ? '<p>' + text + '</p>' : ''}
+                ${photos}
                 <div class="post-date">${p.author ? '<span class="post-author">' + esc(p.author) + '</span> · ' : ''}${date}</div>
                 ${replies}
                 <button class="reply-toggle">Répondre</button>
@@ -1215,6 +1276,13 @@
     });
 
   document.addEventListener('click', async e => {
+    if (e.target.closest('.post-photos') && e.target.tagName === 'IMG') {
+      const container = e.target.closest('.post-photos');
+      const imgs = [...container.querySelectorAll('img')];
+      lbPhotos = imgs.map(img => ({ full: img.dataset.full, title: img.alt }));
+      showLb(imgs.indexOf(e.target));
+      return;
+    }
     if (e.target.classList.contains('reply-toggle')) {
       const form = e.target.nextElementSibling;
       form.style.display = form.style.display === 'none' ? 'flex' : 'none';
@@ -1247,45 +1315,6 @@
   });
 
   // ---- Cloudinary photo galleries ----
-  const CLOUD = 'brgsjrm';
-  const VISIBLE_COUNT = 6;
-  const lb = document.getElementById('lightbox');
-  const lbImg = lb.querySelector('img');
-  const lbCaption = lb.querySelector('.lb-caption');
-  const lbCounter = lb.querySelector('.lb-counter');
-  let lbPhotos = [], lbIndex = 0;
-
-  function showLb(index) {
-    lbIndex = index;
-    const p = lbPhotos[index];
-    lbImg.src = p.full;
-    lbCaption.textContent = p.title;
-    lbCounter.textContent = `${index + 1} / ${lbPhotos.length}`;
-    lb.classList.add('open');
-  }
-
-  lb.addEventListener('click', e => {
-    if (!e.target.closest('.lb-nav') && e.target.tagName !== 'IMG') lb.classList.remove('open');
-  });
-  lb.querySelector('.lb-prev').addEventListener('click', e => { e.stopPropagation(); showLb((lbIndex - 1 + lbPhotos.length) % lbPhotos.length); });
-  lb.querySelector('.lb-next').addEventListener('click', e => { e.stopPropagation(); showLb((lbIndex + 1) % lbPhotos.length); });
-  document.addEventListener('keydown', e => {
-    if (!lb.classList.contains('open')) return;
-    if (e.key === 'Escape') lb.classList.remove('open');
-    if (e.key === 'ArrowLeft') showLb((lbIndex - 1 + lbPhotos.length) % lbPhotos.length);
-    if (e.key === 'ArrowRight') showLb((lbIndex + 1) % lbPhotos.length);
-  });
-
-  let touchStartX = 0;
-  lb.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; }, {passive:true});
-  lb.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(dx) > 50) {
-      if (dx > 0) showLb((lbIndex - 1 + lbPhotos.length) % lbPhotos.length);
-      else showLb((lbIndex + 1) % lbPhotos.length);
-    }
-  });
-
   function loadGallery(section) {
     if (section.dataset.loaded) return;
     section.dataset.loaded = '1';

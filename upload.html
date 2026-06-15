@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Upload Photos · Roadtrip Écosse</title>
+<title>Upload · Roadtrip Écosse</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -20,18 +20,11 @@
     -webkit-font-smoothing:antialiased;
     min-height:100dvh;display:flex;flex-direction:column;
   }
-  .header{
-    padding:32px 24px 24px;text-align:center;
-  }
-  .header h1{
-    font-family:"Fraunces",serif;font-weight:500;
-    font-size:1.8rem;margin:0 0 4px;letter-spacing:-.01em;
-  }
+  .header{padding:32px 24px 24px;text-align:center}
+  .header h1{font-family:"Fraunces",serif;font-weight:500;font-size:1.8rem;margin:0 0 4px;letter-spacing:-.01em}
   .header p{margin:0;font-size:.85rem;color:var(--muted)}
   .header a{color:var(--teal);font-size:.85rem}
-  .container{
-    max-width:500px;width:100%;margin:0 auto;padding:0 20px 40px;flex:1;
-  }
+  .container{max-width:500px;width:100%;margin:0 auto;padding:0 20px 40px;flex:1}
   label{
     display:block;font-family:"Spline Sans Mono",monospace;
     font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;
@@ -42,75 +35,62 @@
     border-radius:10px;background:var(--paper);color:var(--ink);
     font:inherit;font-size:.95rem;appearance:none;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23586460' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:right 14px center;
-    cursor:pointer;
+    background-repeat:no-repeat;background-position:right 14px center;cursor:pointer;
   }
   select:focus{outline:2px solid var(--teal);outline-offset:1px}
+  .row{display:flex;gap:10px;margin-bottom:16px}
+  .row select{margin-bottom:0}
+  .row>*{flex:1}
+  textarea{
+    width:100%;padding:12px 14px;border:1px solid var(--line);
+    border-radius:10px;background:var(--paper);color:var(--ink);
+    font:inherit;font-size:.95rem;resize:vertical;min-height:80px;
+  }
+  textarea:focus{outline:2px solid var(--teal);outline-offset:1px}
+  textarea::placeholder{color:var(--muted)}
   .dropzone{
-    margin-top:20px;border:2px dashed var(--line);border-radius:var(--r);
-    padding:40px 20px;text-align:center;cursor:pointer;
+    margin-top:12px;border:2px dashed var(--line);border-radius:var(--r);
+    padding:20px;text-align:center;cursor:pointer;
     background:var(--paper);transition:.2s;
   }
   .dropzone.over{border-color:var(--teal);background:rgba(31,92,88,.06)}
-  .dropzone .icon{font-size:2rem;margin-bottom:8px}
-  .dropzone .txt{font-size:.9rem;color:var(--muted)}
+  .dropzone .icon{font-size:1.4rem;margin-bottom:4px}
+  .dropzone .txt{font-size:.82rem;color:var(--muted)}
   .dropzone .txt b{color:var(--teal)}
   .dropzone input{display:none}
-  .queue{margin-top:20px;display:flex;flex-direction:column;gap:10px}
-  .item{
-    display:flex;align-items:center;gap:12px;
-    background:var(--paper);border:1px solid var(--line);
-    border-radius:10px;padding:10px 14px;
+  .thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .thumbs .th{
+    position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;
+    border:1px solid var(--line);
   }
-  .item img{
-    width:48px;height:48px;object-fit:cover;border-radius:6px;flex:none;
+  .thumbs .th img{width:100%;height:100%;object-fit:cover}
+  .thumbs .th .rm{
+    position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;
+    background:rgba(0,0,0,.5);color:#fff;font-size:.7rem;border:none;cursor:pointer;
+    display:grid;place-items:center;
   }
-  .item .info{flex:1;min-width:0}
-  .item .title-input{
-    width:100%;padding:4px 8px;border:1px solid var(--line);border-radius:6px;
-    font:inherit;font-size:.85rem;color:var(--ink);background:var(--mist);
-  }
-  .item .title-input:focus{outline:1px solid var(--teal);border-color:var(--teal)}
-  .item .status{font-size:.75rem;color:var(--muted)}
-  .item .status.ok{color:var(--teal)}
-  .item .status.err{color:#c0392b}
-  .item .bar{
-    height:3px;background:var(--mist-2);border-radius:2px;margin-top:4px;overflow:hidden;
-  }
-  .item .bar .fill{height:100%;background:var(--teal);border-radius:2px;width:0%;transition:width .3s}
+  .thumbs .th .bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--mist-2)}
+  .thumbs .th .bar .fill{height:100%;background:var(--teal);width:0%;transition:width .3s}
+  .thumbs .th.ok{border-color:var(--teal)}
+  .thumbs .th.err{border-color:#c0392b}
   .btn{
-    display:block;width:100%;margin-top:24px;padding:14px;
+    display:block;width:100%;margin-top:20px;padding:14px;
     font:inherit;font-size:.95rem;font-weight:600;
     background:var(--teal);color:#fff;border:none;border-radius:10px;
     cursor:pointer;transition:.2s;
   }
   .btn:hover{background:var(--teal-soft)}
   .btn:disabled{opacity:.4;cursor:not-allowed}
-  .summary{
-    margin-top:16px;text-align:center;
-    font-size:.85rem;color:var(--teal);font-weight:500;
-  }
-  .separator{
-    margin:36px 0 24px;border:none;border-top:1px solid var(--line);
-  }
-  textarea{
-    width:100%;padding:12px 14px;border:1px solid var(--line);
-    border-radius:10px;background:var(--paper);color:var(--ink);
-    font:inherit;font-size:.95rem;resize:vertical;min-height:100px;
-  }
-  textarea:focus{outline:2px solid var(--teal);outline-offset:1px}
-  textarea::placeholder{color:var(--muted)}
+  .summary{margin-top:12px;text-align:center;font-size:.85rem;color:var(--teal);font-weight:500}
+  .separator{margin:32px 0 20px;border:none;border-top:1px solid var(--line)}
   .post-list{margin-top:16px;display:flex;flex-direction:column;gap:10px}
-  .post-item{
-    background:var(--paper);border:1px solid var(--line);
-    border-radius:10px;padding:12px 14px;
-  }
+  .post-item{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
   .post-item .post-text{font-size:.9rem;margin:0 0 6px;white-space:pre-wrap}
+  .post-item .post-photos{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+  .post-item .post-photos img{width:56px;height:56px;object-fit:cover;border-radius:6px}
   .post-item .post-meta{font-size:.72rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
   .post-item .post-actions{display:flex;gap:8px}
-  .post-item .edit-btn,.post-item .delete-btn{
-    background:none;border:none;cursor:pointer;font-size:.72rem;padding:2px 6px;
-  }
+  .post-item .edit-btn,.post-item .delete-btn{background:none;border:none;cursor:pointer;font-size:.72rem;padding:2px 6px}
   .post-item .edit-btn{color:var(--teal)}
   .post-item .delete-btn{color:#c0392b}
   .post-item .edit-area{
@@ -118,23 +98,15 @@
     font:inherit;font-size:.85rem;resize:vertical;min-height:60px;margin:6px 0;
   }
   .post-item .edit-actions{display:flex;gap:8px;justify-content:flex-end}
-  .post-item .save-btn,.post-item .cancel-btn{
-    padding:4px 12px;border-radius:6px;border:none;cursor:pointer;font-size:.75rem;font-weight:600;
-  }
+  .post-item .save-btn,.post-item .cancel-btn{padding:4px 12px;border-radius:6px;border:none;cursor:pointer;font-size:.75rem;font-weight:600}
   .post-item .save-btn{background:var(--teal);color:#fff}
   .post-item .cancel-btn{background:var(--mist-2);color:var(--muted)}
   .post-replies{margin:8px 0 0;padding-left:14px;border-left:2px solid var(--mist-2)}
   .post-reply{font-size:.82rem;margin:4px 0;color:var(--ink)}
   .post-reply .reply-author{font-weight:500;color:var(--teal)}
   .post-reply .reply-date{font-size:.7rem;color:var(--muted);margin-left:6px}
-  .post-reply .reply-delete{
-    background:none;border:none;cursor:pointer;font-size:.65rem;
-    color:#c0392b;margin-left:6px;padding:0 4px;
-  }
-  .post-tag{
-    font-family:"Spline Sans Mono",monospace;font-size:.65rem;
-    padding:2px 6px;border-radius:4px;background:var(--mist-2);color:var(--teal);
-  }
+  .post-reply .reply-delete{background:none;border:none;cursor:pointer;font-size:.65rem;color:#c0392b;margin-left:6px;padding:0 4px}
+  .post-tag{font-family:"Spline Sans Mono",monospace;font-size:.65rem;padding:2px 6px;border-radius:4px;background:var(--mist-2);color:var(--teal)}
   .gps-btn{
     display:block;width:100%;margin-top:16px;padding:14px;
     font:inherit;font-size:.95rem;font-weight:600;
@@ -143,59 +115,56 @@
   }
   .gps-btn:hover{background:#a67420}
   .gps-btn:disabled{opacity:.4;cursor:not-allowed}
-  .gps-status{
-    margin-top:8px;text-align:center;
-    font-size:.85rem;color:var(--muted);
-  }
+  .gps-status{margin-top:8px;text-align:center;font-size:.85rem;color:var(--muted)}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>Upload Photos</h1>
-  <p>Ajoute tes photos au roadtrip</p>
+  <h1>Journal</h1>
+  <p>Publie un moment du voyage</p>
   <a href="index.html">&larr; Voir l'itinéraire</a>
 </div>
 
 <div class="container">
-  <label for="tag">Étape</label>
-  <select id="tag">
-    <option value="depart">00 — Départ de Nice</option>
-    <option value="edinburgh">01 — Édimbourg</option>
-    <option value="fort-william">02 — Fort William</option>
-    <option value="mallaig">03 — Mallaig</option>
-    <option value="skye">04 — Île de Skye</option>
-    <option value="ullapool">05 — Ullapool</option>
-    <option value="durness">06 — Durness</option>
-    <option value="dunnet">07 — Dunnet</option>
-    <option value="inverness">08 — Inverness</option>
-    <option value="aviemore">09 — Aviemore</option>
-    <option value="edinburgh-retour">10 — Édimbourg (retour)</option>
-    <option value="retour">11 — Retour à Nice</option>
-  </select>
-
-  <div class="dropzone" id="dropzone">
-    <div class="icon">+</div>
-    <div class="txt">Touche pour <b>choisir des photos</b><br>ou glisse-les ici</div>
-    <input type="file" id="files" accept="image/*" multiple>
+  <div class="row">
+    <div>
+      <label for="tag">Étape</label>
+      <select id="tag">
+        <option value="depart">00 — Départ</option>
+        <option value="edinburgh">01 — Édimbourg</option>
+        <option value="fort-william">02 — Fort William</option>
+        <option value="mallaig">03 — Mallaig</option>
+        <option value="skye">04 — Skye</option>
+        <option value="ullapool">05 — Ullapool</option>
+        <option value="durness">06 — Durness</option>
+        <option value="dunnet">07 — Dunnet</option>
+        <option value="inverness">08 — Inverness</option>
+        <option value="aviemore">09 — Aviemore</option>
+        <option value="edinburgh-retour">10 — Édimbourg</option>
+        <option value="retour">11 — Retour</option>
+      </select>
+    </div>
+    <div>
+      <label for="author">Auteur</label>
+      <select id="author">
+        <option value="Perrine">Perrine</option>
+        <option value="Jérôme">Jérôme</option>
+        <option value="Eliott">Eliott</option>
+        <option value="Simon">Simon</option>
+      </select>
+    </div>
   </div>
 
-  <div class="queue" id="queue"></div>
-  <button class="btn" id="upload-btn" disabled>Envoyer les photos</button>
-  <div class="summary" id="summary"></div>
+  <textarea id="post-text" placeholder="Raconte ce qu'il se passe…"></textarea>
 
-  <hr class="separator">
+  <div class="dropzone" id="dropzone">
+    <div class="icon">📷</div>
+    <div class="txt">Ajoute des <b>photos</b> (optionnel)</div>
+    <input type="file" id="files" accept="image/*" multiple>
+  </div>
+  <div class="thumbs" id="thumbs"></div>
 
-  <label for="author">Auteur</label>
-  <select id="author">
-    <option value="Perrine">Perrine</option>
-    <option value="Jérôme">Jérôme</option>
-    <option value="Eliott">Eliott</option>
-    <option value="Simon">Simon</option>
-  </select>
-
-  <label for="post-text" style="margin-top:16px">Publier un texte</label>
-  <textarea id="post-text" placeholder="Raconte ce qu'il se passe..."></textarea>
   <button class="btn" id="post-btn">Publier</button>
   <div class="summary" id="post-summary"></div>
 
@@ -214,12 +183,18 @@
 <script>
 const CLOUD = 'brgsjrm';
 const PRESET = 'scotland';
+const FB = 'https://scotland-e21ec-default-rtdb.europe-west1.firebasedatabase.app';
+
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('files');
-const queue = document.getElementById('queue');
-const btn = document.getElementById('upload-btn');
-const summary = document.getElementById('summary');
-let pending = [];
+const thumbsEl = document.getElementById('thumbs');
+const postText = document.getElementById('post-text');
+const postBtn = document.getElementById('post-btn');
+const postSummary = document.getElementById('post-summary');
+const allPostsList = document.getElementById('all-posts');
+const tagSelect = document.getElementById('tag');
+
+let photoFiles = [];
 
 dropzone.addEventListener('click', () => fileInput.click());
 dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('over'); });
@@ -227,91 +202,107 @@ dropzone.addEventListener('dragleave', () => dropzone.classList.remove('over'));
 dropzone.addEventListener('drop', e => {
   e.preventDefault();
   dropzone.classList.remove('over');
-  addFiles(e.dataTransfer.files);
+  addPhotos(e.dataTransfer.files);
 });
-fileInput.addEventListener('change', () => addFiles(fileInput.files));
+fileInput.addEventListener('change', () => { addPhotos(fileInput.files); fileInput.value = ''; });
 
-function addFiles(files) {
+function addPhotos(files) {
   [...files].forEach(f => {
     if (!f.type.startsWith('image/')) return;
     const id = Date.now() + Math.random();
-    const nameNoExt = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
-    pending.push({ file: f, id, nameNoExt });
+    photoFiles.push({ file: f, id });
     const thumb = URL.createObjectURL(f);
-    queue.insertAdjacentHTML('beforeend', `
-      <div class="item" data-id="${id}">
-        <img src="${thumb}" alt="">
-        <div class="info">
-          <input class="title-input" value="${nameNoExt}" placeholder="Titre de la photo">
-          <div class="status">En attente</div>
-          <div class="bar"><div class="fill"></div></div>
-        </div>
+    thumbsEl.insertAdjacentHTML('beforeend', `
+      <div class="th" data-id="${id}">
+        <img src="${thumb}">
+        <button class="rm" data-id="${id}">&times;</button>
+        <div class="bar"><div class="fill"></div></div>
       </div>
     `);
   });
-  btn.disabled = pending.length === 0;
-  summary.textContent = '';
 }
 
-btn.addEventListener('click', async () => {
-  if (!pending.length) return;
-  btn.disabled = true;
-  const tag = document.getElementById('tag').value;
-  let ok = 0, fail = 0;
-
-  for (const item of pending) {
-    const el = queue.querySelector(`[data-id="${item.id}"]`);
-    const status = el.querySelector('.status');
-    const fill = el.querySelector('.fill');
-    status.textContent = 'Envoi...';
-    status.className = 'status';
-
-    const titleInput = el.querySelector('.title-input');
-    const title = titleInput.value.trim() || item.nameNoExt;
-    titleInput.readOnly = true;
-    const publicId = tag + '/' + title.replace(/ /g, '-').replace(/[',]/g, '');
-
-    const fd = new FormData();
-    fd.append('file', item.file);
-    fd.append('upload_preset', PRESET);
-    fd.append('tags', tag);
-    fd.append('public_id', publicId);
-
-    try {
-      const resp = await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`);
-        xhr.upload.onprogress = e => {
-          if (e.lengthComputable) fill.style.width = Math.round(e.loaded / e.total * 100) + '%';
-        };
-        xhr.onload = () => xhr.status === 200 ? resolve(JSON.parse(xhr.responseText)) : reject(xhr.responseText);
-        xhr.onerror = () => reject('Erreur réseau');
-        xhr.send(fd);
-      });
-      status.textContent = 'Envoyé';
-      status.className = 'status ok';
-      fill.style.width = '100%';
-      ok++;
-    } catch (e) {
-      status.textContent = 'Erreur';
-      status.className = 'status err';
-      fill.style.width = '0%';
-      fail++;
-    }
-  }
-
-  pending = [];
-  summary.textContent = `${ok} photo(s) envoyée(s)` + (fail ? `, ${fail} erreur(s)` : '');
+thumbsEl.addEventListener('click', e => {
+  if (!e.target.classList.contains('rm')) return;
+  const id = parseFloat(e.target.dataset.id);
+  photoFiles = photoFiles.filter(p => p.id !== id);
+  e.target.closest('.th').remove();
 });
 
-// ---- Firebase posts ----
-const FB = 'https://scotland-e21ec-default-rtdb.europe-west1.firebasedatabase.app';
-const postText = document.getElementById('post-text');
-const postBtn = document.getElementById('post-btn');
-const postSummary = document.getElementById('post-summary');
-const allPostsList = document.getElementById('all-posts');
-const tagSelect = document.getElementById('tag');
+async function uploadPhoto(item, tag) {
+  const el = thumbsEl.querySelector(`[data-id="${item.id}"]`);
+  const fill = el?.querySelector('.fill');
+  const nameNoExt = item.file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+  const title = nameNoExt;
+  const publicId = tag + '/' + title.replace(/ /g, '-').replace(/[',]/g, '') + '-' + Date.now();
 
+  const fd = new FormData();
+  fd.append('file', item.file);
+  fd.append('upload_preset', PRESET);
+  fd.append('tags', tag);
+  fd.append('public_id', publicId);
+
+  const resp = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`);
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable && fill) fill.style.width = Math.round(e.loaded / e.total * 100) + '%';
+    };
+    xhr.onload = () => xhr.status === 200 ? resolve(JSON.parse(xhr.responseText)) : reject(xhr.responseText);
+    xhr.onerror = () => reject('Erreur réseau');
+    xhr.send(fd);
+  });
+
+  if (el) el.classList.add('ok');
+  return {
+    url: resp.secure_url,
+    thumb: `https://res.cloudinary.com/${CLOUD}/image/upload/c_fill,w_400,h_400,q_auto,f_auto/${resp.public_id}.${resp.format}`,
+    full: `https://res.cloudinary.com/${CLOUD}/image/upload/c_limit,w_1600,q_auto,f_auto/${resp.public_id}.${resp.format}`,
+    title
+  };
+}
+
+postBtn.addEventListener('click', async () => {
+  const text = postText.value.trim();
+  if (!text && !photoFiles.length) return;
+  postBtn.disabled = true;
+  postSummary.textContent = photoFiles.length ? 'Upload des photos...' : '';
+  const tag = tagSelect.value;
+  const author = document.getElementById('author').value;
+
+  try {
+    const photos = [];
+    for (const item of photoFiles) {
+      try {
+        photos.push(await uploadPhoto(item, tag));
+      } catch (e) {
+        const el = thumbsEl.querySelector(`[data-id="${item.id}"]`);
+        if (el) el.classList.add('err');
+      }
+    }
+
+    const post = { ts: Date.now(), author };
+    if (text) post.text = text;
+    if (photos.length) post.photos = photos;
+
+    await fetch(`${FB}/posts/${tag}.json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(post)
+    });
+
+    postText.value = '';
+    photoFiles = [];
+    thumbsEl.innerHTML = '';
+    postSummary.textContent = 'Publié !';
+    loadAllPosts();
+  } catch (e) {
+    postSummary.textContent = 'Erreur...';
+  }
+  postBtn.disabled = false;
+});
+
+// ---- All posts management ----
 const TAG_LABELS = {
   depart:'Départ',edinburgh:'Édimbourg','fort-william':'Fort William',
   mallaig:'Mallaig',skye:'Skye',ullapool:'Ullapool',durness:'Durness',
@@ -339,6 +330,12 @@ function loadAllPosts() {
       flat.forEach(post => {
         const d = new Date(post.ts);
         const date = d.toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+        let photosHtml = '';
+        if (post.photos && post.photos.length) {
+          photosHtml = '<div class="post-photos">' + post.photos.map(p =>
+            `<img src="${p.thumb}" alt="${escHtml(p.title || '')}">`
+          ).join('') + '</div>';
+        }
         let repliesHtml = '';
         if (post.replies) {
           repliesHtml = '<div class="post-replies">' + Object.entries(post.replies).map(([rk, r]) => {
@@ -352,7 +349,8 @@ function loadAllPosts() {
         }
         allPostsList.insertAdjacentHTML('beforeend', `
           <div class="post-item" data-tag="${post.tag}" data-key="${post.key}">
-            <p class="post-text">${escHtml(post.text)}</p>
+            ${post.text ? '<p class="post-text">' + escHtml(post.text) + '</p>' : ''}
+            ${photosHtml}
             <div class="post-meta">
               <span><span class="post-tag">${TAG_LABELS[post.tag] || post.tag}</span> ${post.author || ''} · ${date}</span>
               <div class="post-actions">
@@ -369,26 +367,6 @@ function loadAllPosts() {
 
 loadAllPosts();
 
-postBtn.addEventListener('click', async () => {
-  const text = postText.value.trim();
-  if (!text) return;
-  postBtn.disabled = true;
-  const tag = tagSelect.value;
-  try {
-    await fetch(`${FB}/posts/${tag}.json`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, ts: Date.now(), author: document.getElementById('author').value })
-    });
-    postText.value = '';
-    postSummary.textContent = 'Publié !';
-    loadAllPosts();
-  } catch (e) {
-    postSummary.textContent = 'Erreur...';
-  }
-  postBtn.disabled = false;
-});
-
 allPostsList.addEventListener('click', async e => {
   const item = e.target.closest('.post-item');
   if (!item) return;
@@ -401,6 +379,7 @@ allPostsList.addEventListener('click', async e => {
 
   if (e.target.classList.contains('edit-btn')) {
     const textEl = item.querySelector('.post-text');
+    if (!textEl) return;
     const current = textEl.textContent;
     textEl.innerHTML = `<textarea class="edit-area">${escHtml(current)}</textarea>
       <div class="edit-actions">
