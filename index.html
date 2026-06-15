@@ -312,13 +312,13 @@
   .post-bubble .post-photos{
     display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:8px 0 4px;
   }
-  .post-bubble .post-photos.single{grid-template-columns:1fr;max-width:200px}
-  .post-bubble .post-photos.duo{grid-template-columns:1fr 1fr}
+  .post-bubble .post-photos.single{grid-template-columns:repeat(4,1fr)}
+  .post-bubble .post-photos.duo{grid-template-columns:repeat(4,1fr)}
   .post-bubble .post-photos img{
     width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;cursor:pointer;
     border:1px solid var(--line);transition:transform .2s;
   }
-  .post-bubble .post-photos.single img{aspect-ratio:4/3}
+  .post-bubble .post-photos.single img{aspect-ratio:1}
   .post-bubble .post-photos img:hover{transform:scale(1.04)}
   .post-bubble .post-date{font-size:.7rem;color:var(--muted);margin-top:6px}
   .post-bubble .post-author{font-weight:500;color:var(--teal);font-size:.78rem}
