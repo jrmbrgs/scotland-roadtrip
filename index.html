@@ -960,6 +960,10 @@
       attribution:'&copy; Esri, Maxar, Earthstar Geographics',
       maxZoom:19
     }).addTo(map);
+    L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner-labels/{z}/{x}/{y}.png', {
+      attribution:'&copy; <a href="https://stamen.com">Stamen</a>',
+      maxZoom:19, pane:'overlayPane'
+    }).addTo(map);
 
     // ---- route segments via hotel coordinates ----
     const driveStyle = { color:'#1F5C58', weight:4, opacity:.85, lineCap:'round', lineJoin:'round' };
