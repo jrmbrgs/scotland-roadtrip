@@ -1111,7 +1111,7 @@
           .addTo(map)
           .bindPopup(`<b>Position actuelle</b><br><span class="pd">${ago}</span>`)
           .openPopup();
-        const R = 5000;
+        const R = 2000;
         map.fitBounds(L.latLng(loc.lat, loc.lng).toBounds(R * 2), { padding:[20,20] });
       })
       .catch(() => {
