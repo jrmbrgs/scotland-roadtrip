@@ -116,9 +116,42 @@
   .gps-btn:hover{background:#a67420}
   .gps-btn:disabled{opacity:.4;cursor:not-allowed}
   .gps-status{margin-top:8px;text-align:center;font-size:.85rem;color:var(--muted)}
+  .login-overlay{
+    position:fixed;inset:0;z-index:100;
+    background:var(--mist);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .login-overlay.hidden{display:none}
+  .login-box{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+    padding:32px;width:100%;max-width:360px;margin:0 20px;
+    box-shadow:0 4px 20px rgba(21,40,42,.08);
+  }
+  .login-box h2{font-family:"Fraunces",serif;font-weight:500;font-size:1.5rem;margin:0 0 4px}
+  .login-box p{color:var(--muted);font-size:.85rem;margin:0 0 20px}
+  .login-box input{
+    width:100%;padding:12px 14px;border:1px solid var(--line);
+    border-radius:10px;background:var(--paper);color:var(--ink);
+    font:inherit;font-size:.95rem;margin-bottom:10px;
+  }
+  .login-box input:focus{outline:2px solid var(--teal);outline-offset:1px}
+  .login-error{color:#c0392b;font-size:.82rem;margin-top:8px;text-align:center}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 </head>
 <body>
+
+<div class="login-overlay" id="login-overlay">
+  <div class="login-box">
+    <h2>Connexion</h2>
+    <p>Réservé à la famille</p>
+    <input type="email" id="login-email" placeholder="Email" autocomplete="email">
+    <input type="password" id="login-password" placeholder="Mot de passe" autocomplete="current-password">
+    <button class="btn" id="login-btn">Se connecter</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
 
 <div class="header">
   <h1>Journal</h1>
@@ -184,6 +217,43 @@
 const CLOUD = 'brgsjrm';
 const PRESET = 'scotland';
 const FB = 'https://scotland-e21ec-default-rtdb.europe-west1.firebasedatabase.app';
+
+firebase.initializeApp({
+  apiKey: "AIzaSyC0wgRxNEz_Vq9Yi0WUwoSIycgRteF1AnQ",
+  authDomain: "scotland-e21ec.firebaseapp.com",
+  databaseURL: FB,
+  projectId: "scotland-e21ec"
+});
+
+async function getAuthToken() {
+  const u = firebase.auth().currentUser;
+  return u ? u.getIdToken() : '';
+}
+
+const loginOverlay = document.getElementById('login-overlay');
+const loginBtn = document.getElementById('login-btn');
+const loginError = document.getElementById('login-error');
+
+loginBtn.addEventListener('click', () => {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-password').value;
+  loginError.textContent = '';
+  firebase.auth().signInWithEmailAndPassword(email, pw)
+    .catch(() => { loginError.textContent = 'Email ou mot de passe incorrect'; });
+});
+
+document.getElementById('login-password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') loginBtn.click();
+});
+
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    loginOverlay.classList.add('hidden');
+    loadAllPosts();
+  } else {
+    loginOverlay.classList.remove('hidden');
+  }
+});
 
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('files');
@@ -285,7 +355,8 @@ postBtn.addEventListener('click', async () => {
     if (text) post.text = text;
     if (photos.length) post.photos = photos;
 
-    await fetch(`${FB}/posts/${tag}.json`, {
+    const token = await getAuthToken();
+    await fetch(`${FB}/posts/${tag}.json?auth=${token}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(post)
@@ -365,15 +436,14 @@ function loadAllPosts() {
     });
 }
 
-loadAllPosts();
-
 allPostsList.addEventListener('click', async e => {
   const item = e.target.closest('.post-item');
   if (!item) return;
   const { tag, key } = item.dataset;
 
   if (e.target.classList.contains('delete-btn')) {
-    await fetch(`${FB}/posts/${tag}/${key}.json`, { method: 'DELETE' });
+    const tk = await getAuthToken();
+    await fetch(`${FB}/posts/${tag}/${key}.json?auth=${tk}`, { method: 'DELETE' });
     loadAllPosts();
   }
 
@@ -392,7 +462,8 @@ allPostsList.addEventListener('click', async e => {
     const textarea = item.querySelector('.edit-area');
     const newText = textarea.value.trim();
     if (newText) {
-      await fetch(`${FB}/posts/${tag}/${key}/text.json`, {
+      const tk2 = await getAuthToken();
+      await fetch(`${FB}/posts/${tag}/${key}/text.json?auth=${tk2}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newText)
@@ -408,7 +479,8 @@ allPostsList.addEventListener('click', async e => {
   if (e.target.classList.contains('reply-delete')) {
     const reply = e.target.closest('.post-reply');
     const rk = reply.dataset.replyKey;
-    await fetch(`${FB}/posts/${tag}/${key}/replies/${rk}.json`, { method: 'DELETE' });
+    const tk3 = await getAuthToken();
+    await fetch(`${FB}/posts/${tag}/${key}/replies/${rk}.json?auth=${tk3}`, { method: 'DELETE' });
     loadAllPosts();
   }
 });
@@ -427,7 +499,8 @@ gpsBtn.addEventListener('click', () => {
   navigator.geolocation.getCurrentPosition(
     async pos => {
       const { latitude, longitude } = pos.coords;
-      await fetch(`${FB}/location.json`, {
+      const tk4 = await getAuthToken();
+      await fetch(`${FB}/location.json?auth=${tk4}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lat: latitude, lng: longitude, ts: Date.now() })

@@ -914,6 +914,8 @@
   <div class="lb-counter"></div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
   // ---- Countdown ----
@@ -952,6 +954,17 @@
     {n:10, name:"Édimbourg",   d:"13 → 14 juil. · 1 nuit",    lat:55.9533, lng:-3.1883, start:"2026-07-13", end:"2026-07-14", id:"stop-10"}
   ];
   const FB = 'https://scotland-e21ec-default-rtdb.europe-west1.firebasedatabase.app';
+  firebase.initializeApp({
+    apiKey: "AIzaSyC0wgRxNEz_Vq9Yi0WUwoSIycgRteF1AnQ",
+    authDomain: "scotland-e21ec.firebaseapp.com",
+    databaseURL: FB,
+    projectId: "scotland-e21ec"
+  });
+  firebase.auth().signInAnonymously().catch(() => {});
+  async function getAuthToken() {
+    const u = firebase.auth().currentUser;
+    return u ? u.getIdToken() : '';
+  }
   const mapToday = new Date().toISOString().slice(0, 10);
 
   if (window.L) {
@@ -1299,7 +1312,8 @@
       const text = form.querySelector('.reply-text').value.trim();
       if (!name || !text) return;
       const {tag, key} = bubble.dataset;
-      await fetch(`${FB}/posts/${tag}/${key}/replies.json`, {
+      const token = await getAuthToken();
+      await fetch(`${FB}/posts/${tag}/${key}/replies.json?auth=${token}`, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({name, text, ts:Date.now()})

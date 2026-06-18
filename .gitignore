@@ -1,1 +1,4 @@
 .DS_Store
+.creds/
+service-account.json
+node_modules/
