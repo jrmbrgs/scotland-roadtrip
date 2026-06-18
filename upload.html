@@ -157,6 +157,7 @@
   <h1>Journal</h1>
   <p>Publie un moment du voyage</p>
   <a href="index.html">&larr; Voir l'itinéraire</a>
+  <br><a href="#" id="logout-link" style="font-size:.75rem;color:var(--muted)">Déconnexion</a>
 </div>
 
 <div class="container">
@@ -227,7 +228,7 @@ firebase.initializeApp({
 
 async function getAuthToken() {
   const u = firebase.auth().currentUser;
-  return u ? u.getIdToken() : '';
+  return u ? u.getIdToken(true) : '';
 }
 
 const loginOverlay = document.getElementById('login-overlay');
@@ -244,6 +245,11 @@ loginBtn.addEventListener('click', () => {
 
 document.getElementById('login-password').addEventListener('keydown', e => {
   if (e.key === 'Enter') loginBtn.click();
+});
+
+document.getElementById('logout-link').addEventListener('click', e => {
+  e.preventDefault();
+  firebase.auth().signOut();
 });
 
 firebase.auth().onAuthStateChanged(user => {
