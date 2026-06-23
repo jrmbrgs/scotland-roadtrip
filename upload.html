@@ -391,10 +391,9 @@ function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-async function loadAllPosts() {
+function loadAllPosts() {
   allPostsList.innerHTML = '';
-  const tk = await getAuthToken();
-  fetch(`${FB}/posts.json?auth=${tk}`)
+  fetch(`${FB}/posts.json`)
     .then(r => r.json())
     .then(allPosts => {
       if (!allPosts) return;

@@ -1259,8 +1259,7 @@
     ).join('') + '</div>';
   }
 
-  function loadPosts(authToken) {
-  fetch(`${FB}/posts.json?auth=${authToken}`)
+  fetch(`${FB}/posts.json`)
     .then(r => r.json())
     .then(allPosts => {
       TAGS.forEach(tag => {
@@ -1296,7 +1295,6 @@
         section.parentNode.insertBefore(div, section);
       });
     });
-  }
 
   document.addEventListener('click', async e => {
     if (e.target.closest('.post-photos') && e.target.tagName === 'IMG') {
@@ -1428,10 +1426,10 @@
   })();
 
   // ---- New post badge ----
-  function loadBadges(authToken) {
+  (function(){
     const seen = JSON.parse(localStorage.getItem('scotland-seen-posts') || '{}');
     const addBadge = () => {
-      fetch(`${FB}/posts.json?auth=${authToken}`).then(r => r.json()).then(allPosts => {
+      fetch(`${FB}/posts.json`).then(r => r.json()).then(allPosts => {
         if (!allPosts) return;
         const newSeen = {};
         Object.entries(allPosts).forEach(([tag, posts]) => {
@@ -1455,14 +1453,7 @@
       });
     };
     setTimeout(addBadge, 1500);
-  }
-
-  firebase.auth().onAuthStateChanged(async user => {
-    if (!user) return;
-    const token = await user.getIdToken();
-    loadPosts(token);
-    loadBadges(token);
-  });
+  })();
 </script>
 </body>
 </html>
