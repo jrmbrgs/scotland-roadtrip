@@ -954,15 +954,15 @@
     {n:10, name:"Édimbourg",   d:"13 → 14 juil. · 1 nuit",    lat:55.9533, lng:-3.1883, start:"2026-07-13", end:"2026-07-14", id:"stop-10"}
   ];
   const FB = 'https://scotland-e21ec-default-rtdb.europe-west1.firebasedatabase.app';
-  firebase.initializeApp({
+  const publicApp = firebase.initializeApp({
     apiKey: "AIzaSyC0wgRxNEz_Vq9Yi0WUwoSIycgRteF1AnQ",
     authDomain: "scotland-e21ec.firebaseapp.com",
     databaseURL: FB,
     projectId: "scotland-e21ec"
-  });
-  firebase.auth().signInAnonymously().catch(() => {});
+  }, 'public');
+  publicApp.auth().signInAnonymously().catch(() => {});
   async function getAuthToken() {
-    const u = firebase.auth().currentUser;
+    const u = publicApp.auth().currentUser;
     return u ? u.getIdToken() : '';
   }
   const mapToday = new Date().toISOString().slice(0, 10);
