@@ -362,11 +362,12 @@ postBtn.addEventListener('click', async () => {
     if (photos.length) post.photos = photos;
 
     const token = await getAuthToken();
-    await fetch(`${FB}/posts/${tag}.json?auth=${token}`, {
+    const resp = await fetch(`${FB}/posts/${tag}.json?auth=${token}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(post)
     });
+    if (!resp.ok) throw new Error(`Firebase ${resp.status}`);
 
     postText.value = '';
     photoFiles = [];
@@ -506,11 +507,16 @@ gpsBtn.addEventListener('click', () => {
     async pos => {
       const { latitude, longitude } = pos.coords;
       const tk4 = await getAuthToken();
-      await fetch(`${FB}/location.json?auth=${tk4}`, {
+      const gpsResp = await fetch(`${FB}/location.json?auth=${tk4}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lat: latitude, lng: longitude, ts: Date.now() })
       });
+      if (!gpsResp.ok) {
+        gpsStatus.textContent = 'Erreur : écriture refusée par Firebase';
+        gpsBtn.disabled = false;
+        return;
+      }
       gpsStatus.textContent = `Position partagée (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
       gpsBtn.disabled = false;
     },
