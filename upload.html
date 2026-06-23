@@ -252,8 +252,13 @@ document.getElementById('logout-link').addEventListener('click', e => {
   firebase.auth().signOut();
 });
 
-firebase.auth().onAuthStateChanged(user => {
+firebase.auth().onAuthStateChanged(async user => {
   if (user) {
+    const result = await user.getIdTokenResult(true);
+    if (!result.claims.admin) {
+      loginError.textContent = 'Ce compte n\'a pas les droits admin. Lancez set-admin.js puis reconnectez-vous.';
+      return;
+    }
     loginOverlay.classList.add('hidden');
     loadAllPosts();
   } else {
@@ -450,7 +455,8 @@ allPostsList.addEventListener('click', async e => {
 
   if (e.target.classList.contains('delete-btn')) {
     const tk = await getAuthToken();
-    await fetch(`${FB}/posts/${tag}/${key}.json?auth=${tk}`, { method: 'DELETE' });
+    const resp = await fetch(`${FB}/posts/${tag}/${key}.json?auth=${tk}`, { method: 'DELETE' });
+    if (!resp.ok) { alert('Suppression refusée par Firebase (' + resp.status + ')'); return; }
     loadAllPosts();
   }
 
