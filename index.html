@@ -487,7 +487,7 @@
 <section class="map-section">
   <div class="map-head">
     <h2>L'itinéraire en un coup d'œil</h2>
-    <p>Trajet routier réel · ferry en pointillés · cliquez sur une étape</p>
+    <p id="map-subtitle">Trajet routier réel · ferry en pointillés · cliquez sur une étape</p>
   </div>
   <div id="map"></div>
 </section>
@@ -1124,6 +1124,9 @@
         const ago = age < 3600000
           ? `il y a ${Math.round(age / 60000)} min`
           : `il y a ${Math.round(age / 3600000)}h`;
+        const posDate = new Date(loc.ts);
+        const posTime = posDate.toLocaleString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+        document.getElementById('map-subtitle').textContent = `Dernière position GPS : ${posTime} (${ago})`;
         L.marker([loc.lat, loc.lng], { icon: liveIcon, zIndexOffset: 2000 })
           .addTo(map)
           .bindPopup(`<b>Position actuelle</b><br><span class="pd">${ago}</span>`)
