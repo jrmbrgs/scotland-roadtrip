@@ -256,9 +256,12 @@ async function checkAdminAndEnter(user) {
 loginBtn.addEventListener('click', () => {
   const email = document.getElementById('login-email').value.trim();
   const pw = document.getElementById('login-password').value;
-  loginError.textContent = '';
+  loginError.textContent = 'Envoi…';
   firebase.auth().signInWithEmailAndPassword(email, pw)
-    .then(cred => checkAdminAndEnter(cred.user))
+    .then(cred => {
+      loginError.textContent = 'signIn OK, uid=' + cred.user.uid;
+      return checkAdminAndEnter(cred.user);
+    })
     .catch(err => { loginError.textContent = err.code + ' — ' + err.message; });
 });
 
