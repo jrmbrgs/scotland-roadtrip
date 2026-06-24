@@ -237,11 +237,26 @@ const loginOverlay = document.getElementById('login-overlay');
 const loginBtn = document.getElementById('login-btn');
 const loginError = document.getElementById('login-error');
 
+async function checkAdminAndEnter(user) {
+  try {
+    const result = await user.getIdTokenResult(true);
+    if (!result.claims.admin) {
+      loginError.textContent = 'Ce compte n\'a pas les droits admin. Lancez set-admin.js puis reconnectez-vous.';
+      return;
+    }
+    loginOverlay.classList.add('hidden');
+    loadAllPosts();
+  } catch (err) {
+    loginError.textContent = 'Erreur d\'authentification : ' + err.message;
+  }
+}
+
 loginBtn.addEventListener('click', () => {
   const email = document.getElementById('login-email').value.trim();
   const pw = document.getElementById('login-password').value;
   loginError.textContent = '';
   firebase.auth().signInWithEmailAndPassword(email, pw)
+    .then(cred => checkAdminAndEnter(cred.user))
     .catch(err => { loginError.textContent = err.code + ' — ' + err.message; });
 });
 
@@ -254,19 +269,9 @@ document.getElementById('logout-link').addEventListener('click', e => {
   firebase.auth().signOut();
 });
 
-firebase.auth().onAuthStateChanged(async user => {
+firebase.auth().onAuthStateChanged(user => {
   if (user) {
-    try {
-      const result = await user.getIdTokenResult(true);
-      if (!result.claims.admin) {
-        loginError.textContent = 'Ce compte n\'a pas les droits admin. Lancez set-admin.js puis reconnectez-vous.';
-        return;
-      }
-      loginOverlay.classList.add('hidden');
-      loadAllPosts();
-    } catch (err) {
-      loginError.textContent = 'Erreur d\'authentification : ' + err.message;
-    }
+    checkAdminAndEnter(user);
   } else {
     loginOverlay.classList.remove('hidden');
   }
