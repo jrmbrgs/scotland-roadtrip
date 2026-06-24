@@ -251,12 +251,13 @@ async function checkAdminAndEnter(user) {
   }
 }
 
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+
 loginBtn.addEventListener('click', () => {
   const email = document.getElementById('login-email').value.trim();
   const pw = document.getElementById('login-password').value;
-  loginError.textContent = '';
-  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
-    .then(() => firebase.auth().signInWithEmailAndPassword(email, pw))
+  loginError.textContent = 'Envoi…';
+  firebase.auth().signInWithEmailAndPassword(email, pw)
     .then(cred => checkAdminAndEnter(cred.user))
     .catch(err => { loginError.textContent = err.code + ' — ' + err.message; });
 });
