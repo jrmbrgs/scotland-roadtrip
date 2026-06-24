@@ -228,38 +228,56 @@ firebase.initializeApp({
   projectId: "scotland-e21ec"
 });
 
-async function getAuthToken() {
-  const u = firebase.auth().currentUser;
-  return u ? u.getIdToken(true) : '';
-}
-
 const loginOverlay = document.getElementById('login-overlay');
 const loginBtn = document.getElementById('login-btn');
 const loginError = document.getElementById('login-error');
 
-async function checkAdminAndEnter(user) {
-  try {
-    const result = await user.getIdTokenResult();
-    if (!result.claims.admin) {
-      loginError.textContent = 'Ce compte n\'a pas les droits admin. Lancez set-admin.js puis reconnectez-vous.';
-      return;
-    }
-    loginOverlay.classList.add('hidden');
-    loadAllPosts();
-  } catch (err) {
-    loginError.textContent = 'Erreur token : ' + err.code + ' — ' + err.message;
-  }
+const API_KEY = 'AIzaSyC0wgRxNEz_Vq9Yi0WUwoSIycgRteF1AnQ';
+let restIdToken = null;
+
+function parseJwt(token) {
+  const b = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+  return JSON.parse(atob(b));
 }
 
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+async function signInRest(email, password) {
+  const res = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + API_KEY, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({email, password, returnSecureToken: true})
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data;
+}
 
-loginBtn.addEventListener('click', () => {
+async function checkAdminAndEnter(idToken) {
+  const claims = parseJwt(idToken);
+  if (!claims.admin) {
+    loginError.textContent = 'Ce compte n\'a pas les droits admin.';
+    return;
+  }
+  restIdToken = idToken;
+  loginOverlay.classList.add('hidden');
+  loadAllPosts();
+}
+
+async function getAuthToken() {
+  const u = firebase.auth().currentUser;
+  if (u) return u.getIdToken(true);
+  return restIdToken || '';
+}
+
+loginBtn.addEventListener('click', async () => {
   const email = document.getElementById('login-email').value.trim();
   const pw = document.getElementById('login-password').value;
-  loginError.textContent = 'Envoi…';
-  firebase.auth().signInWithEmailAndPassword(email, pw)
-    .then(cred => checkAdminAndEnter(cred.user))
-    .catch(err => { loginError.textContent = err.code + ' — ' + err.message; });
+  loginError.textContent = '';
+  try {
+    const data = await signInRest(email, pw);
+    await checkAdminAndEnter(data.idToken);
+  } catch (err) {
+    loginError.textContent = err.message;
+  }
 });
 
 document.getElementById('login-password').addEventListener('keydown', e => {
@@ -268,13 +286,20 @@ document.getElementById('login-password').addEventListener('keydown', e => {
 
 document.getElementById('logout-link').addEventListener('click', e => {
   e.preventDefault();
+  restIdToken = null;
   firebase.auth().signOut();
+  loginOverlay.classList.remove('hidden');
 });
 
 firebase.auth().onAuthStateChanged(user => {
   if (user) {
-    checkAdminAndEnter(user);
-  } else {
+    user.getIdTokenResult().then(result => {
+      if (result.claims.admin) {
+        loginOverlay.classList.add('hidden');
+        loadAllPosts();
+      }
+    }).catch(() => {});
+  } else if (!restIdToken) {
     loginOverlay.classList.remove('hidden');
   }
 });
