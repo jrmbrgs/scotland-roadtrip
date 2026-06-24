@@ -238,10 +238,8 @@ const loginBtn = document.getElementById('login-btn');
 const loginError = document.getElementById('login-error');
 
 async function checkAdminAndEnter(user) {
-  loginError.textContent = 'Connexion réussie, vérification…';
   try {
     const result = await user.getIdTokenResult();
-    loginError.textContent = 'Token OK, claims: ' + JSON.stringify(result.claims.admin);
     if (!result.claims.admin) {
       loginError.textContent = 'Ce compte n\'a pas les droits admin. Lancez set-admin.js puis reconnectez-vous.';
       return;
@@ -256,12 +254,10 @@ async function checkAdminAndEnter(user) {
 loginBtn.addEventListener('click', () => {
   const email = document.getElementById('login-email').value.trim();
   const pw = document.getElementById('login-password').value;
-  loginError.textContent = 'Envoi…';
-  firebase.auth().signInWithEmailAndPassword(email, pw)
-    .then(cred => {
-      loginError.textContent = 'signIn OK, uid=' + cred.user.uid;
-      return checkAdminAndEnter(cred.user);
-    })
+  loginError.textContent = '';
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+    .then(() => firebase.auth().signInWithEmailAndPassword(email, pw))
+    .then(cred => checkAdminAndEnter(cred.user))
     .catch(err => { loginError.textContent = err.code + ' — ' + err.message; });
 });
 
