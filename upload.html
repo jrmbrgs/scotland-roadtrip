@@ -120,6 +120,7 @@
     position:fixed;inset:0;z-index:100;
     background:var(--mist);
     display:flex;align-items:center;justify-content:center;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
   }
   .login-overlay.hidden{display:none}
   .login-box{
@@ -132,7 +133,8 @@
   .login-box input{
     width:100%;padding:12px 14px;border:1px solid var(--line);
     border-radius:10px;background:var(--paper);color:var(--ink);
-    font:inherit;font-size:.95rem;margin-bottom:10px;
+    font:inherit;font-size:16px;margin-bottom:10px;
+    -webkit-appearance:none;appearance:none;
   }
   .login-box input:focus{outline:2px solid var(--teal);outline-offset:1px}
   .login-error{color:#c0392b;font-size:.82rem;margin-top:8px;text-align:center}
@@ -240,7 +242,7 @@ loginBtn.addEventListener('click', () => {
   const pw = document.getElementById('login-password').value;
   loginError.textContent = '';
   firebase.auth().signInWithEmailAndPassword(email, pw)
-    .catch(() => { loginError.textContent = 'Email ou mot de passe incorrect'; });
+    .catch(err => { loginError.textContent = err.code + ' — ' + err.message; });
 });
 
 document.getElementById('login-password').addEventListener('keydown', e => {
@@ -254,13 +256,17 @@ document.getElementById('logout-link').addEventListener('click', e => {
 
 firebase.auth().onAuthStateChanged(async user => {
   if (user) {
-    const result = await user.getIdTokenResult(true);
-    if (!result.claims.admin) {
-      loginError.textContent = 'Ce compte n\'a pas les droits admin. Lancez set-admin.js puis reconnectez-vous.';
-      return;
+    try {
+      const result = await user.getIdTokenResult(true);
+      if (!result.claims.admin) {
+        loginError.textContent = 'Ce compte n\'a pas les droits admin. Lancez set-admin.js puis reconnectez-vous.';
+        return;
+      }
+      loginOverlay.classList.add('hidden');
+      loadAllPosts();
+    } catch (err) {
+      loginError.textContent = 'Erreur d\'authentification : ' + err.message;
     }
-    loginOverlay.classList.add('hidden');
-    loadAllPosts();
   } else {
     loginOverlay.classList.remove('hidden');
   }
