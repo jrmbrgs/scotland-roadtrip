@@ -125,6 +125,7 @@
   .gps-toggle input:checked+.slider{background:var(--gold)}
   .gps-toggle input:checked+.slider::before{transform:translateX(20px)}
   .gps-countdown{font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+  .gps-last-time{margin-top:4px;text-align:center;font-size:.78rem;color:var(--muted)}
   .login-overlay{
     position:fixed;inset:0;z-index:100;
     background:var(--mist);
@@ -218,6 +219,7 @@
   <label>Position GPS</label>
   <button class="gps-btn" id="gps-btn">Partager ma position</button>
   <div class="gps-status" id="gps-status"></div>
+  <div class="gps-last-time" id="gps-last-time"></div>
   <div class="gps-auto-row">
     <label class="gps-toggle"><input type="checkbox" id="gps-auto"><span class="slider"></span></label>
     <label for="gps-auto">Actualiser toutes les 5 min</label>
@@ -553,6 +555,7 @@ allPostsList.addEventListener('click', async e => {
 // ---- GPS ----
 const gpsBtn = document.getElementById('gps-btn');
 const gpsStatus = document.getElementById('gps-status');
+const gpsLastTime = document.getElementById('gps-last-time');
 const gpsAutoToggle = document.getElementById('gps-auto');
 const gpsCountdown = document.getElementById('gps-countdown');
 const GPS_INTERVAL = 5 * 60 * 1000;
@@ -585,6 +588,7 @@ function sendGpsPosition() {
           return;
         }
         gpsStatus.textContent = `Position partagée (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+        gpsLastTime.textContent = `Dernier envoi : ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
         gpsBtn.disabled = false;
         resolve(true);
       },
@@ -634,6 +638,16 @@ gpsAutoToggle.addEventListener('change', () => {
     stopGpsAuto();
   }
 });
+
+(async () => {
+  try {
+    const r = await fetch(`${FB}/location.json`);
+    const loc = await r.json();
+    if (loc && loc.ts) {
+      gpsLastTime.textContent = `Dernier envoi : ${new Date(loc.ts).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+  } catch {}
+})();
 </script>
 </body>
 </html>
