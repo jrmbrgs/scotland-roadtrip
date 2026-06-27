@@ -126,6 +126,11 @@
   .gps-toggle input:checked+.slider::before{transform:translateX(20px)}
   .gps-countdown{font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
   .gps-last-time{margin-top:4px;text-align:center;font-size:.78rem;color:var(--muted)}
+  .gps-history{margin-top:12px;font-size:.78rem;color:var(--muted)}
+  .gps-history-title{font-weight:600;margin-bottom:6px;color:var(--ink);font-size:.82rem}
+  .gps-history-item{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--mist-2)}
+  .gps-history-item:last-child{border-bottom:none}
+  .gps-history-time{font-variant-numeric:tabular-nums}
   .login-overlay{
     position:fixed;inset:0;z-index:100;
     background:var(--mist);
@@ -225,6 +230,7 @@
     <label for="gps-auto">Actualiser toutes les 5 min</label>
     <span class="gps-countdown" id="gps-countdown"></span>
   </div>
+  <div class="gps-history" id="gps-history"></div>
 
   <hr class="separator">
 
@@ -597,6 +603,7 @@ function sendGpsPosition() {
         }
         gpsStatus.textContent = `Position partagée (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
         gpsLastTime.textContent = `Dernier envoi : ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+        loadGpsInfo();
         gpsBtn.disabled = false;
         resolve(true);
       },
@@ -647,15 +654,35 @@ gpsAutoToggle.addEventListener('change', () => {
   }
 });
 
-(async () => {
+const gpsHistory = document.getElementById('gps-history');
+
+function renderGpsHistory(data) {
+  if (!data) { gpsHistory.innerHTML = ''; return; }
+  const pts = Object.values(data)
+    .filter(p => p && p.lat && p.lng && p.ts)
+    .sort((a, b) => b.ts - a.ts)
+    .slice(0, 10);
+  if (!pts.length) { gpsHistory.innerHTML = ''; return; }
+  const fmt = ts => new Date(ts).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  gpsHistory.innerHTML = '<div class="gps-history-title">10 dernières positions</div>' +
+    pts.map(p => `<div class="gps-history-item"><span class="gps-history-time">${fmt(p.ts)}</span><span>${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</span></div>`).join('');
+}
+
+async function loadGpsInfo() {
   try {
-    const r = await fetch(`${FB}/location.json`);
-    const loc = await r.json();
+    const [locR, histR] = await Promise.all([
+      fetch(`${FB}/location.json`),
+      fetch(`${FB}/location_history.json`)
+    ]);
+    const loc = await locR.json();
     if (loc && loc.ts) {
       gpsLastTime.textContent = `Dernier envoi : ${new Date(loc.ts).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
     }
+    renderGpsHistory(await histR.json());
   } catch {}
-})();
+}
+
+loadGpsInfo();
 </script>
 </body>
 </html>
