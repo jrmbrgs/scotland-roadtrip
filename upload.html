@@ -576,11 +576,19 @@ function sendGpsPosition() {
       async pos => {
         const { latitude, longitude } = pos.coords;
         const tk4 = await getAuthToken();
-        const gpsResp = await fetch(`${FB}/location.json?auth=${tk4}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lat: latitude, lng: longitude, ts: Date.now() })
-        });
+        const payload = { lat: latitude, lng: longitude, ts: Date.now() };
+        const [gpsResp, histResp] = await Promise.all([
+          fetch(`${FB}/location.json?auth=${tk4}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }),
+          fetch(`${FB}/location_history.json?auth=${tk4}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          })
+        ]);
         if (!gpsResp.ok) {
           gpsStatus.textContent = 'Erreur : écriture refusée par Firebase';
           gpsBtn.disabled = false;
