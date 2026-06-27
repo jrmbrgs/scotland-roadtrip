@@ -131,6 +131,14 @@
   .gps-history-item{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--mist-2)}
   .gps-history-item:last-child{border-bottom:none}
   .gps-history-time{font-variant-numeric:tabular-nums}
+  .gps-clear-btn{
+    display:block;width:100%;margin-top:12px;padding:10px;
+    font:inherit;font-size:.82rem;font-weight:600;
+    background:none;color:#c0392b;border:1px solid #e0b4ad;border-radius:8px;
+    cursor:pointer;transition:.2s;
+  }
+  .gps-clear-btn:hover{background:#fbecea}
+  .gps-clear-btn:disabled{opacity:.4;cursor:not-allowed}
   .login-overlay{
     position:fixed;inset:0;z-index:100;
     background:var(--mist);
@@ -231,6 +239,7 @@
     <span class="gps-countdown" id="gps-countdown"></span>
   </div>
   <div class="gps-history" id="gps-history"></div>
+  <button class="gps-clear-btn" id="gps-clear-btn" hidden>Effacer toutes les positions</button>
 
   <hr class="separator">
 
@@ -655,6 +664,32 @@ gpsAutoToggle.addEventListener('change', () => {
 });
 
 const gpsHistory = document.getElementById('gps-history');
+const gpsClearBtn = document.getElementById('gps-clear-btn');
+
+async function clearGpsPositions() {
+  if (!confirm('Effacer la position courante et tout l\'historique GPS ? Cette action est irréversible.')) return;
+  gpsClearBtn.disabled = true;
+  gpsStatus.textContent = 'Suppression en cours...';
+  try {
+    const tk = await getAuthToken();
+    const [locResp, histResp] = await Promise.all([
+      fetch(`${FB}/location.json?auth=${tk}`, { method: 'DELETE' }),
+      fetch(`${FB}/location_history.json?auth=${tk}`, { method: 'DELETE' })
+    ]);
+    if (!locResp.ok || !histResp.ok) {
+      gpsStatus.textContent = 'Erreur : suppression refusée par Firebase';
+    } else {
+      gpsStatus.textContent = 'Positions effacées';
+      gpsLastTime.textContent = '';
+    }
+  } catch {
+    gpsStatus.textContent = 'Erreur lors de la suppression';
+  }
+  await loadGpsInfo();
+  gpsClearBtn.disabled = false;
+}
+
+gpsClearBtn.addEventListener('click', clearGpsPositions);
 
 function renderGpsHistory(data) {
   if (!data) { gpsHistory.innerHTML = ''; return; }
@@ -678,7 +713,10 @@ async function loadGpsInfo() {
     if (loc && loc.ts) {
       gpsLastTime.textContent = `Dernier envoi : ${new Date(loc.ts).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
     }
-    renderGpsHistory(await histR.json());
+    const hist = await histR.json();
+    renderGpsHistory(hist);
+    const hasData = (loc && loc.ts) || (hist && Object.keys(hist).length > 0);
+    gpsClearBtn.hidden = !hasData;
   } catch {}
 }
 
