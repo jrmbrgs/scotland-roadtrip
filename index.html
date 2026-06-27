@@ -1101,67 +1101,64 @@
     setTimeout(() => map.invalidateSize(), 250);
     window.addEventListener('load', () => map.invalidateSize());
 
-    // ---- GPS trace from history (road-snapped via OSRM) ----
-    fetch(`${FB}/location_history.json`)
-      .then(r => r.json())
-      .then(async data => {
-        if (!data) return;
-        const pts = Object.values(data)
-          .filter(p => p && p.lat && p.lng && p.ts)
-          .sort((a, b) => a.ts - b.ts);
-        if (pts.length < 2) return;
-        const coords = pts.map(p => `${p.lng},${p.lat}`).join(';');
-        try {
-          const osrm = await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`);
-          const route = await osrm.json();
-          if (route.code === 'Ok' && route.routes[0]) {
-            const geojson = route.routes[0].geometry;
-            const latlngs = geojson.coordinates.map(c => [c[1], c[0]]);
-            L.polyline(latlngs, { color: '#e74c3c', weight: 3, opacity: 0.7, dashArray: '8 6' }).addTo(map);
-            return;
-          }
-        } catch {}
-        L.polyline(pts.map(p => [p.lat, p.lng]), { color: '#e74c3c', weight: 3, opacity: 0.7, dashArray: '8 6' }).addTo(map);
-      })
-      .catch(() => {});
-
-    // ---- Live position from Firebase → zoom on it ----
+    // ---- GPS trace + live position (awaited together) ----
     const allPts = stops.map(s => [s.lat, s.lng]);
     allPts.push([ARMADALE.lat, ARMADALE.lng]);
 
-    fetch(`${FB}/location.json`)
-      .then(r => r.json())
-      .then(loc => {
-        if (!loc || !loc.lat) {
-          map.fitBounds(L.latLngBounds(allPts), { padding:[40,40] });
-          return;
+    const traceP = fetch(`${FB}/location_history.json`).then(r => r.json()).catch(() => null);
+    const locP = fetch(`${FB}/location.json`).then(r => r.json()).catch(() => null);
+
+    Promise.all([traceP, locP]).then(async ([histData, loc]) => {
+      let totalKm = 0;
+
+      if (histData) {
+        const pts = Object.values(histData)
+          .filter(p => p && p.lat && p.lng && p.ts)
+          .sort((a, b) => a.ts - b.ts);
+        if (pts.length >= 2) {
+          const coords = pts.map(p => `${p.lng},${p.lat}`).join(';');
+          try {
+            const osrm = await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`);
+            const route = await osrm.json();
+            if (route.code === 'Ok' && route.routes[0]) {
+              const latlngs = route.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+              L.polyline(latlngs, { color: '#e74c3c', weight: 3, opacity: 0.7, dashArray: '8 6' }).addTo(map);
+              totalKm = Math.round(route.routes[0].distance / 1000);
+            }
+          } catch {
+            L.polyline(pts.map(p => [p.lat, p.lng]), { color: '#e74c3c', weight: 3, opacity: 0.7, dashArray: '8 6' }).addTo(map);
+          }
         }
-        const age = Date.now() - loc.ts;
-        if (age > 48 * 3600 * 1000) {
-          map.fitBounds(L.latLngBounds(allPts), { padding:[40,40] });
-          return;
-        }
-        const liveIcon = L.divIcon({
-          className: '',
-          html: '<div class="live-dot"></div>',
-          iconSize: [16, 16], iconAnchor: [8, 8], popupAnchor: [0, -12]
-        });
-        const ago = age < 3600000
-          ? `il y a ${Math.round(age / 60000)} min`
-          : `il y a ${Math.round(age / 3600000)}h`;
-        const posDate = new Date(loc.ts);
-        const posTime = posDate.toLocaleString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
-        document.getElementById('map-subtitle').textContent = `Dernière position GPS : ${posTime} (${ago})`;
-        L.marker([loc.lat, loc.lng], { icon: liveIcon, zIndexOffset: 2000 })
-          .addTo(map)
-          .bindPopup(`<b>Position actuelle</b><br><span class="pd">${ago}</span>`)
-          .openPopup();
-        const R = 2000;
-        map.fitBounds(L.latLng(loc.lat, loc.lng).toBounds(R * 2), { padding:[20,20] });
-      })
-      .catch(() => {
+      }
+
+      if (!loc || !loc.lat) {
         map.fitBounds(L.latLngBounds(allPts), { padding:[40,40] });
+        return;
+      }
+      const age = Date.now() - loc.ts;
+      if (age > 48 * 3600 * 1000) {
+        map.fitBounds(L.latLngBounds(allPts), { padding:[40,40] });
+        return;
+      }
+      const liveIcon = L.divIcon({
+        className: '',
+        html: '<div class="live-dot"></div>',
+        iconSize: [16, 16], iconAnchor: [8, 8], popupAnchor: [0, -12]
       });
+      const ago = age < 3600000
+        ? `il y a ${Math.round(age / 60000)} min`
+        : `il y a ${Math.round(age / 3600000)}h`;
+      const posDate = new Date(loc.ts);
+      const posTime = posDate.toLocaleString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+      const kmInfo = totalKm ? ` · ${totalKm} km parcourus` : '';
+      document.getElementById('map-subtitle').textContent = `Dernière position GPS : ${posTime} (${ago})${kmInfo}`;
+      L.marker([loc.lat, loc.lng], { icon: liveIcon, zIndexOffset: 2000 })
+        .addTo(map)
+        .bindPopup(`<b>Position actuelle</b><br><span class="pd">${ago}</span>`)
+        .openPopup();
+      const R = 2000;
+      map.fitBounds(L.latLng(loc.lat, loc.lng).toBounds(R * 2), { padding:[20,20] });
+    });
   } else {
     document.getElementById('map').innerHTML =
       '<div style="padding:24px;font-size:.9rem;color:var(--muted);text-align:center">' +
