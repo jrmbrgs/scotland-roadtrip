@@ -116,6 +116,15 @@
   .gps-btn:hover{background:#a67420}
   .gps-btn:disabled{opacity:.4;cursor:not-allowed}
   .gps-status{margin-top:8px;text-align:center;font-size:.85rem;color:var(--muted)}
+  .gps-auto-row{display:flex;align-items:center;gap:10px;margin-top:12px;justify-content:center}
+  .gps-auto-row label{font-size:.85rem;color:var(--muted);cursor:pointer;user-select:none}
+  .gps-toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+  .gps-toggle input{opacity:0;width:0;height:0}
+  .gps-toggle .slider{position:absolute;inset:0;background:var(--mist-2);border-radius:12px;transition:.3s;cursor:pointer}
+  .gps-toggle .slider::before{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.3s}
+  .gps-toggle input:checked+.slider{background:var(--gold)}
+  .gps-toggle input:checked+.slider::before{transform:translateX(20px)}
+  .gps-countdown{font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
   .login-overlay{
     position:fixed;inset:0;z-index:100;
     background:var(--mist);
@@ -209,6 +218,11 @@
   <label>Position GPS</label>
   <button class="gps-btn" id="gps-btn">Partager ma position</button>
   <div class="gps-status" id="gps-status"></div>
+  <div class="gps-auto-row">
+    <label class="gps-toggle"><input type="checkbox" id="gps-auto"><span class="slider"></span></label>
+    <label for="gps-auto">Actualiser toutes les 5 min</label>
+    <span class="gps-countdown" id="gps-countdown"></span>
+  </div>
 
   <hr class="separator">
 
@@ -539,37 +553,86 @@ allPostsList.addEventListener('click', async e => {
 // ---- GPS ----
 const gpsBtn = document.getElementById('gps-btn');
 const gpsStatus = document.getElementById('gps-status');
+const gpsAutoToggle = document.getElementById('gps-auto');
+const gpsCountdown = document.getElementById('gps-countdown');
+const GPS_INTERVAL = 5 * 60 * 1000;
+let gpsTimerId = null;
+let gpsCountdownId = null;
+let gpsNextTick = 0;
 
-gpsBtn.addEventListener('click', () => {
-  if (!navigator.geolocation) {
-    gpsStatus.textContent = 'GPS non disponible sur cet appareil';
-    return;
-  }
-  gpsBtn.disabled = true;
-  gpsStatus.textContent = 'Localisation en cours...';
-  navigator.geolocation.getCurrentPosition(
-    async pos => {
-      const { latitude, longitude } = pos.coords;
-      const tk4 = await getAuthToken();
-      const gpsResp = await fetch(`${FB}/location.json?auth=${tk4}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lat: latitude, lng: longitude, ts: Date.now() })
-      });
-      if (!gpsResp.ok) {
-        gpsStatus.textContent = 'Erreur : écriture refusée par Firebase';
+function sendGpsPosition() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      gpsStatus.textContent = 'GPS non disponible sur cet appareil';
+      resolve(false);
+      return;
+    }
+    gpsBtn.disabled = true;
+    gpsStatus.textContent = 'Localisation en cours...';
+    navigator.geolocation.getCurrentPosition(
+      async pos => {
+        const { latitude, longitude } = pos.coords;
+        const tk4 = await getAuthToken();
+        const gpsResp = await fetch(`${FB}/location.json?auth=${tk4}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lat: latitude, lng: longitude, ts: Date.now() })
+        });
+        if (!gpsResp.ok) {
+          gpsStatus.textContent = 'Erreur : écriture refusée par Firebase';
+          gpsBtn.disabled = false;
+          resolve(false);
+          return;
+        }
+        gpsStatus.textContent = `Position partagée (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
         gpsBtn.disabled = false;
-        return;
-      }
-      gpsStatus.textContent = `Position partagée (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
-      gpsBtn.disabled = false;
-    },
-    err => {
-      gpsStatus.textContent = 'Erreur : ' + (err.code === 1 ? 'permission refusée' : 'impossible de localiser');
-      gpsBtn.disabled = false;
-    },
-    { enableHighAccuracy: true, timeout: 10000 }
-  );
+        resolve(true);
+      },
+      err => {
+        gpsStatus.textContent = 'Erreur : ' + (err.code === 1 ? 'permission refusée' : 'impossible de localiser');
+        gpsBtn.disabled = false;
+        resolve(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  });
+}
+
+function updateCountdown() {
+  const remaining = Math.max(0, gpsNextTick - Date.now());
+  const min = Math.floor(remaining / 60000);
+  const sec = Math.floor((remaining % 60000) / 1000);
+  gpsCountdown.textContent = `${min}:${String(sec).padStart(2, '0')}`;
+  if (remaining <= 0) gpsCountdown.textContent = '';
+}
+
+function startGpsAuto() {
+  sendGpsPosition();
+  gpsNextTick = Date.now() + GPS_INTERVAL;
+  gpsTimerId = setInterval(() => {
+    sendGpsPosition();
+    gpsNextTick = Date.now() + GPS_INTERVAL;
+  }, GPS_INTERVAL);
+  gpsCountdownId = setInterval(updateCountdown, 1000);
+  updateCountdown();
+}
+
+function stopGpsAuto() {
+  clearInterval(gpsTimerId);
+  clearInterval(gpsCountdownId);
+  gpsTimerId = null;
+  gpsCountdownId = null;
+  gpsCountdown.textContent = '';
+}
+
+gpsBtn.addEventListener('click', () => sendGpsPosition());
+
+gpsAutoToggle.addEventListener('change', () => {
+  if (gpsAutoToggle.checked) {
+    startGpsAuto();
+  } else {
+    stopGpsAuto();
+  }
 });
 </script>
 </body>
