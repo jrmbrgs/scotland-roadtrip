@@ -321,6 +321,8 @@
   }
   .post-bubble .post-photos.single img{aspect-ratio:1}
   .post-bubble .post-photos img:hover{transform:scale(1.04)}
+  .post-bubble .post-videos{margin:8px 0 4px}
+  .post-bubble .post-videos video{width:100%;border-radius:6px;max-height:360px;background:#000}
   .post-bubble .post-date{font-size:.7rem;color:var(--muted);margin-bottom:6px}
   .post-bubble .post-author{font-weight:500;color:var(--teal);font-size:.78rem}
   .post-replies{margin:6px 0 0;padding-left:14px;border-left:2px solid var(--mist-2)}
@@ -1308,6 +1310,13 @@
     ).join('') + '</div>';
   }
 
+  function renderPostVideos(videos) {
+    if (!videos || !videos.length) return '';
+    return '<div class="post-videos">' + videos.map(v =>
+      `<video src="${v.url}" controls preload="metadata" playsinline></video>`
+    ).join('') + '</div>';
+  }
+
   fetch(`${FB}/posts.json`)
     .then(r => r.json())
     .then(allPosts => {
@@ -1324,11 +1333,13 @@
               const text = p.text ? esc(p.text) : '';
               const date = fmtDate(p.ts);
               const photos = renderPostPhotos(p.photos);
+              const videos = renderPostVideos(p.videos);
               const replies = renderReplies(p.replies);
               return `<div class="post-bubble" data-tag="${tag}" data-key="${key}">
                 <div class="post-date">${p.author ? '<span class="post-author">' + esc(p.author) + '</span> · ' : ''}${date}</div>
                 ${text ? '<p>' + text + '</p>' : ''}
                 ${photos}
+                ${videos}
                 ${replies}
                 <button class="reply-toggle">Répondre</button>
                 <div class="reply-form" style="display:none">

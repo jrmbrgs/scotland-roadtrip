@@ -224,6 +224,13 @@
   </div>
   <div class="thumbs" id="thumbs"></div>
 
+  <div class="dropzone" id="dropzone-video">
+    <div class="icon">🎬</div>
+    <div class="txt">Ajoute une <b>vidéo</b> (optionnel)</div>
+    <input type="file" id="video-file" accept="video/*">
+  </div>
+  <div class="thumbs" id="video-thumbs"></div>
+
   <button class="btn" id="post-btn">Publier</button>
   <div class="summary" id="post-summary"></div>
 
@@ -345,6 +352,11 @@ const allPostsList = document.getElementById('all-posts');
 const tagSelect = document.getElementById('tag');
 
 let photoFiles = [];
+let videoFile = null;
+
+const dropzoneVideo = document.getElementById('dropzone-video');
+const videoInput = document.getElementById('video-file');
+const videoThumbs = document.getElementById('video-thumbs');
 
 dropzone.addEventListener('click', () => fileInput.click());
 dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('over'); });
@@ -355,6 +367,27 @@ dropzone.addEventListener('drop', e => {
   addPhotos(e.dataTransfer.files);
 });
 fileInput.addEventListener('change', () => { addPhotos(fileInput.files); fileInput.value = ''; });
+
+dropzoneVideo.addEventListener('click', () => videoInput.click());
+dropzoneVideo.addEventListener('dragover', e => { e.preventDefault(); dropzoneVideo.classList.add('over'); });
+dropzoneVideo.addEventListener('dragleave', () => dropzoneVideo.classList.remove('over'));
+dropzoneVideo.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzoneVideo.classList.remove('over');
+  const f = [...e.dataTransfer.files].find(f => f.type.startsWith('video/'));
+  if (f) setVideo(f);
+});
+videoInput.addEventListener('change', () => { if (videoInput.files[0]) setVideo(videoInput.files[0]); videoInput.value = ''; });
+
+function setVideo(f) {
+  videoFile = f;
+  videoThumbs.innerHTML = `<div class="th" id="video-th">
+    <div style="width:64px;height:64px;display:grid;place-items:center;font-size:1.4rem;background:var(--mist-2);border-radius:8px">🎬</div>
+    <button class="rm" id="video-rm">&times;</button>
+    <div class="bar"><div class="fill" id="video-fill"></div></div>
+  </div>`;
+  document.getElementById('video-rm').addEventListener('click', () => { videoFile = null; videoThumbs.innerHTML = ''; });
+}
 
 function addPhotos(files) {
   [...files].forEach(f => {
@@ -412,11 +445,42 @@ async function uploadPhoto(item, tag) {
   };
 }
 
+async function uploadVideo(file, tag) {
+  const fill = document.getElementById('video-fill');
+  const th = document.getElementById('video-th');
+  const nameNoExt = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+  const publicId = tag + '/' + nameNoExt.replace(/ /g, '-') + '-' + Date.now();
+
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', PRESET);
+  fd.append('tags', tag);
+  fd.append('public_id', publicId);
+
+  const resp = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD}/video/upload`);
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable && fill) fill.style.width = Math.round(e.loaded / e.total * 100) + '%';
+    };
+    xhr.onload = () => xhr.status === 200 ? resolve(JSON.parse(xhr.responseText)) : reject(xhr.responseText);
+    xhr.onerror = () => reject('Erreur réseau');
+    xhr.send(fd);
+  });
+
+  if (th) th.classList.add('ok');
+  return {
+    url: resp.secure_url,
+    thumb: `https://res.cloudinary.com/${CLOUD}/video/upload/c_fill,w_400,h_400,q_auto,f_jpg/${resp.public_id}.jpg`,
+    title: nameNoExt
+  };
+}
+
 postBtn.addEventListener('click', async () => {
   const text = postText.value.trim();
-  if (!text && !photoFiles.length) return;
+  if (!text && !photoFiles.length && !videoFile) return;
   postBtn.disabled = true;
-  postSummary.textContent = photoFiles.length ? 'Upload des photos...' : '';
+  postSummary.textContent = (photoFiles.length || videoFile) ? 'Upload en cours...' : '';
   const tag = tagSelect.value;
   const author = document.getElementById('author').value;
 
@@ -431,9 +495,21 @@ postBtn.addEventListener('click', async () => {
       }
     }
 
+    const videos = [];
+    if (videoFile) {
+      try {
+        postSummary.textContent = 'Upload de la vidéo...';
+        videos.push(await uploadVideo(videoFile, tag));
+      } catch (e) {
+        const th = document.getElementById('video-th');
+        if (th) th.classList.add('err');
+      }
+    }
+
     const post = { ts: Date.now(), author };
     if (text) post.text = text;
     if (photos.length) post.photos = photos;
+    if (videos.length) post.videos = videos;
 
     const token = await getAuthToken();
     const resp = await fetch(`${FB}/posts/${tag}.json?auth=${token}`, {
@@ -445,7 +521,9 @@ postBtn.addEventListener('click', async () => {
 
     postText.value = '';
     photoFiles = [];
+    videoFile = null;
     thumbsEl.innerHTML = '';
+    videoThumbs.innerHTML = '';
     postSummary.textContent = 'Publié !';
     loadAllPosts();
   } catch (e) {
@@ -488,6 +566,12 @@ function loadAllPosts() {
             `<img src="${p.thumb}" alt="${escHtml(p.title || '')}">`
           ).join('') + '</div>';
         }
+        let videosHtml = '';
+        if (post.videos && post.videos.length) {
+          videosHtml = post.videos.map(v =>
+            `<video src="${v.url}" controls preload="metadata" playsinline style="width:100%;border-radius:6px;margin:6px 0;max-height:200px;background:#000"></video>`
+          ).join('');
+        }
         let repliesHtml = '';
         if (post.replies) {
           repliesHtml = '<div class="post-replies">' + Object.entries(post.replies).map(([rk, r]) => {
@@ -503,6 +587,7 @@ function loadAllPosts() {
           <div class="post-item" data-tag="${post.tag}" data-key="${post.key}">
             ${post.text ? '<p class="post-text">' + escHtml(post.text) + '</p>' : ''}
             ${photosHtml}
+            ${videosHtml}
             <div class="post-meta">
               <span><span class="post-tag">${TAG_LABELS[post.tag] || post.tag}</span> ${post.author || ''} · ${date}</span>
               <div class="post-actions">
